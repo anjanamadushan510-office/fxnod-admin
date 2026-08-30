@@ -21,7 +21,7 @@ export default function AdminLayout({
             admin@fxnod.com
           </div>
           <Link
-            href="/home"
+            href={"/login" as any}
             className="text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-colors"
           >
             Exit Admin

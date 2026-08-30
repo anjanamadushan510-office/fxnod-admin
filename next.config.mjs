@@ -11,7 +11,7 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
 
   experimental: {
-    typedRoutes: true,
+    typedRoutes: false,
     // Trim what ships to the client for these heavy libs.
     optimizePackageImports: ["lucide-react", "@tanstack/react-query"],
   },
