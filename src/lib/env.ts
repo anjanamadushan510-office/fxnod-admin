@@ -26,8 +26,8 @@ function required(name: string, value: string | undefined): string {
 export const env = {
   /** Backend REST base, e.g. https://api.fxnod.com (no trailing slash). */
   apiUrl: required("NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_API_URL),
-  /** Backend WS base, e.g. wss://api.fxnod.com (no trailing slash). Not required for Admin. */
-  wsUrl: process.env.NEXT_PUBLIC_WS_URL || "",
+  /** Backend WS base, e.g. wss://api.fxnod.com (no trailing slash). */
+  wsUrl: required("NEXT_PUBLIC_WS_URL", process.env.NEXT_PUBLIC_WS_URL),
   /** True only in `next dev`. */
   isDev: process.env.NODE_ENV !== "production",
 } as const;
