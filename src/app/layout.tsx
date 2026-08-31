@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { AdminGuard } from "@/components/auth/AdminGuard";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -30,7 +31,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${jetbrainsMono.variable}`}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AdminGuard>{children}</AdminGuard>
+        </Providers>
       </body>
     </html>
   );

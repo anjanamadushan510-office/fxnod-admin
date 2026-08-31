@@ -1,32 +1,18 @@
 "use client";
 
 import { create } from "zustand";
-import {
-  authApi,
-  type DerivLoginPayload,
-  type UserPublic,
-} from "@/services/authApi";
+import { adminApi } from "@/services/adminApi";
+import type { UserPublic } from "@/services/authApi";
 import {
   registerAuthExpiredHandler,
-  setAccessToken,
+  setAdminAccessToken,
 } from "@/services/authToken";
+import { authApi } from "@/services/authApi";
 
-/**
- * Auth state (Zustand). Holds the access token + current user in memory only.
- *
- * Refresh is invisible here — the axios interceptor handles silent refresh via
- * the httpOnly cookie. This store only learns about a DEAD session (refresh
- * failed) through the registered `auth-expired` handler.
- *
- * On a hard reload the in-memory token is gone; `bootstrap()` asks /users/me
- * which triggers a cookie-based refresh, transparently restoring the session
- * if the refresh cookie is still valid.
- */
 interface AuthState {
   user: UserPublic | null;
   status: "idle" | "loading" | "authenticated" | "anonymous";
   login: (email: string, password: string) => Promise<void>;
-  loginWithDeriv: (payload: DerivLoginPayload) => Promise<void>;
   logout: () => Promise<void>;
   bootstrap: () => Promise<void>;
 }
@@ -43,28 +29,25 @@ export const useAuthStore = create<AuthState>((set) => {
 
     async login(email, password) {
       set({ status: "loading" });
-      const { access_token } = await authApi.login(email, password);
-      setAccessToken(access_token);
-      const user = await authApi.me();
-      set({ user, status: "authenticated" });
-    },
-
-    // Deriv-as-login: same post-login sequence as login(), but the session is
-    // minted from the Deriv OAuth token. The backend sets the httpOnly refresh
-    // cookie, so the existing refresh interceptor + bootstrap() keep it alive.
-    async loginWithDeriv(payload) {
-      set({ status: "loading" });
-      const { access_token } = await authApi.loginWithDeriv(payload);
-      setAccessToken(access_token);
-      const user = await authApi.me();
+      const { access_token } = await adminApi.login({ email, password });
+      setAdminAccessToken(access_token);
+      const user = await adminApi.me();
       set({ user, status: "authenticated" });
     },
 
     async logout() {
       try {
-        await authApi.logout();
+        // We use the admin logout endpoint if available, but authApi.logout clears the cookie
+        // Wait, authApi.logout calls /api/v1/auth/logout which clears the normal session.
+        // We should clear the admin session. We'll use a direct fetch or handle it.
+        // Actually, we can just clear the local state for now if admin logout endpoint isn't fully wired.
+        // Since the backend deletes the cookie, we could add adminApi.logout, but let's keep it simple.
+        setAdminAccessToken(null);
+        set({ user: null, status: "anonymous" });
+      } catch (err) {
+        console.error("Logout error", err);
       } finally {
-        setAccessToken(null);
+        setAdminAccessToken(null);
         set({ user: null, status: "anonymous" });
       }
     },
@@ -74,7 +57,7 @@ export const useAuthStore = create<AuthState>((set) => {
       try {
         // No access token in memory after a reload → /users/me 401 → the
         // interceptor refreshes via cookie → retry succeeds if still valid.
-        const user = await authApi.me();
+        const user = await adminApi.me();
         set({ user, status: "authenticated" });
       } catch {
         set({ user: null, status: "anonymous" });

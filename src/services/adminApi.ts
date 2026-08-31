@@ -16,4 +16,8 @@ export const adminApi = {
     const res = await api.patch<UserPublic>(`/api/v1/admin/users/${userId}/access`, payload);
     return res.data;
   },
+  me: async () => {
+    const res = await api.get<UserPublic>("/api/v1/auth/admin/me");
+    return res.data;
+  },
 };
