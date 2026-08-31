@@ -8,6 +8,10 @@ export const adminApi = {
     const res = await api.post("/api/v1/auth/admin/login", credentials);
     return res.data;
   },
+  logout: async () => {
+    const res = await api.post("/api/v1/auth/admin/logout");
+    return res.data;
+  },
   getUsers: async () => {
     const res = await api.get<UserPublic[]>("/api/v1/admin/users");
     return res.data;

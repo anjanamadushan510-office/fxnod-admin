@@ -5,13 +5,13 @@ import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { adminApi } from "@/services/adminApi";
-import { setAdminAccessToken } from "@/services/authToken";
+import { useAuthStore } from "@/stores/authStore";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { Field, SubmitButton } from "@/components/auth/fields";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,13 +23,7 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      const data = await adminApi.login({ email, password });
-      
-      // Store the admin access token differently or handle it
-      // For simplicity, we just use the existing setAccessToken or setAdminAccessToken
-      // We need a helper if we have separate tokens
-      setAdminAccessToken(data.access_token);
-      
+      await login(email, password);
       toast.success("Admin login successful");
       router.push("/admin/dashboard" as Route);
     } catch (err: any) {

@@ -37,13 +37,7 @@ export const useAuthStore = create<AuthState>((set) => {
 
     async logout() {
       try {
-        // We use the admin logout endpoint if available, but authApi.logout clears the cookie
-        // Wait, authApi.logout calls /api/v1/auth/logout which clears the normal session.
-        // We should clear the admin session. We'll use a direct fetch or handle it.
-        // Actually, we can just clear the local state for now if admin logout endpoint isn't fully wired.
-        // Since the backend deletes the cookie, we could add adminApi.logout, but let's keep it simple.
-        setAdminAccessToken(null);
-        set({ user: null, status: "anonymous" });
+        await adminApi.logout();
       } catch (err) {
         console.error("Logout error", err);
       } finally {
