@@ -10,7 +10,7 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-slate-50">
       {/* Sidebar */}
-      <aside className="w-72 bg-[#0a0f1c] text-white flex flex-col shadow-2xl hidden md:flex sticky top-0 h-screen overflow-y-auto">
+      <aside className="w-64 bg-[#0a0f1c] text-white flex flex-col shadow-2xl hidden md:flex sticky top-0 h-screen overflow-y-auto">
         <div className="h-20 flex items-center px-8 border-b border-white/5 shrink-0">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3 shadow-lg shadow-indigo-500/20">
             <ShieldAlert className="w-5 h-5 text-white" />
