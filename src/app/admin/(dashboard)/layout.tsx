@@ -31,15 +31,7 @@ export default function AdminLayout({
             </div>
             <span className="font-medium">Dashboard</span>
           </Link>
-          <Link 
-            href={"/admin/users" as any}
-            className="flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all duration-300 text-slate-300 hover:text-white group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-colors">
-              <Users className="w-4 h-4" />
-            </div>
-            <span className="font-medium">User Management</span>
-          </Link>
+          {/* User Management link removed as requested */}
         </nav>
         
         <div className="p-6 border-t border-white/5 text-xs font-medium text-slate-500 text-center shrink-0">
