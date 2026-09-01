@@ -67,7 +67,7 @@ export default function AdminUsersPage() {
       
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 relative overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-gold/5 to-gold-2/5 rounded-full blur-3xl -z-10"></div>
         
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">User Management</h1>
@@ -81,13 +81,13 @@ export default function AdminUsersPage() {
             </div>
             <input
               type="text"
-              className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-2xl bg-slate-50/50 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 focus:bg-white transition-all shadow-inner"
+              className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-2xl bg-slate-50/50 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold focus:bg-white transition-all shadow-inner"
               placeholder="Search by email or name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <button className="h-11 w-11 flex items-center justify-center bg-white border border-gray-200 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-colors shadow-sm">
+          <button className="h-11 w-11 flex items-center justify-center bg-white border border-gray-200 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-gold transition-colors shadow-sm">
             <Filter className="w-5 h-5" />
           </button>
         </div>
@@ -117,7 +117,7 @@ export default function AdminUsersPage() {
                 <tr>
                   <td colSpan={4} className="px-8 py-20 text-center text-slate-500">
                     <div className="flex flex-col items-center justify-center space-y-4">
-                      <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-8 h-8 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
                       <p className="font-medium">Loading user database...</p>
                     </div>
                   </td>
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
                   <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-700 flex items-center justify-center font-bold mr-4 border border-indigo-200/50 shadow-sm group-hover:scale-110 transition-transform">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/10 to-gold-2/10 text-gold-3 flex items-center justify-center font-bold mr-4 border border-gold/20 shadow-sm group-hover:scale-110 transition-transform">
                           {user.email.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -168,7 +168,7 @@ export default function AdminUsersPage() {
                         {user.dbot_receipt_url ? (
                           <button
                             onClick={() => setSelectedReceipt(user.dbot_receipt_url)}
-                            className="inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm"
+                            className="inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-xl text-slate-600 font-medium hover:bg-slate-50 hover:text-gold hover:border-gold/30 transition-all shadow-sm"
                             title="View Receipt"
                           >
                             <Eye className="w-4 h-4 mr-2" />

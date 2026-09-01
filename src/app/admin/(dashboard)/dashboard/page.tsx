@@ -7,35 +7,35 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="flex flex-col gap-2">
-        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Dashboard Overview</h1>
-        <p className="text-lg text-slate-500">Welcome back. Select a module to manage platform operations.</p>
+        <h1 className="text-4xl font-extrabold text-navy tracking-tight">Dashboard Overview</h1>
+        <p className="text-lg text-navy-3">Welcome back. Select a module to manage platform operations.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {/* dBot Management Card */}
         <Link href={"/admin/users" as any} className="group block h-full">
-          <div className="h-full bg-white rounded-3xl p-8 border border-gray-100 shadow-xl shadow-gray-200/40 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-100 transition-all duration-500 relative overflow-hidden flex flex-col">
+          <div className="h-full bg-white rounded-3xl p-8 border border-gold/20 shadow-xl shadow-gold/5 hover:shadow-2xl hover:shadow-gold/20 hover:border-gold/40 transition-all duration-500 relative overflow-hidden flex flex-col">
             
             {/* Background decoration */}
-            <div className="absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 -z-10"></div>
+            <div className="absolute -top-12 -right-12 w-48 h-48 bg-gradient-to-br from-gold/10 to-gold-2/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 -z-10"></div>
             
             <div className="flex items-start justify-between mb-10">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold to-gold-2 text-navy flex items-center justify-center shadow-lg shadow-gold/30 group-hover:scale-110 transition-transform duration-500">
                 <Cpu className="w-8 h-8" />
               </div>
-              <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
-                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-indigo-600 transition-colors" />
+              <div className="w-10 h-10 rounded-full bg-gold/5 flex items-center justify-center group-hover:bg-gold/10 transition-colors">
+                <ArrowRight className="w-5 h-5 text-gold-3 group-hover:text-gold transition-colors" />
               </div>
             </div>
             
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-slate-900 mb-3">dBot Management</h2>
-              <p className="text-slate-500 leading-relaxed">
+              <h2 className="text-2xl font-bold text-navy mb-3">dBot Management</h2>
+              <p className="text-navy-3 leading-relaxed">
                 Access the registered users database for dBot. Review user access requests, payment receipts, and manage permissions.
               </p>
             </div>
             
-            <div className="mt-8 flex items-center gap-2 text-sm font-bold text-indigo-600 group-hover:gap-3 transition-all">
+            <div className="mt-8 flex items-center gap-2 text-sm font-bold text-gold group-hover:gap-3 transition-all">
               <Users className="w-5 h-5" />
               <span>Manage Users</span>
               <ArrowRight className="w-4 h-4 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
