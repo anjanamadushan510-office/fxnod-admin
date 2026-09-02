@@ -125,9 +125,9 @@ export default function AdminDepositsPage() {
                     <td className="p-5">
                       <span
                         className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide ${
-                          dep.status === "pending"
+                          dep.status.toUpperCase() === "PENDING"
                             ? "bg-yellow-100 text-yellow-700"
-                            : dep.status === "approved"
+                            : dep.status.toUpperCase() === "APPROVED"
                             ? "bg-green-100 text-green-700"
                             : "bg-red-100 text-red-700"
                         }`}
@@ -136,7 +136,7 @@ export default function AdminDepositsPage() {
                       </span>
                     </td>
                     <td className="p-5 flex justify-end gap-2">
-                      {dep.status === "pending" && (
+                      {dep.status.toUpperCase() === "PENDING" && (
                         <>
                           <button
                             onClick={() => handleApprove(dep.id)}
@@ -156,7 +156,7 @@ export default function AdminDepositsPage() {
                           </button>
                         </>
                       )}
-                      {dep.status !== "pending" && (
+                      {dep.status.toUpperCase() !== "PENDING" && (
                         <span className="text-xs text-slate-400 font-medium px-4 py-2">No actions available</span>
                       )}
                     </td>
