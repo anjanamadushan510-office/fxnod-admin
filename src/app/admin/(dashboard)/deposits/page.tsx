@@ -115,7 +115,7 @@ export default function AdminDepositsPage() {
                       {dep.user_id}
                     </td>
                     <td className="p-5 font-extrabold text-green-600 text-base">
-                      ${dep.amount} {dep.currency}
+                      ${Number(dep.amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 8 })} {dep.currency}
                     </td>
                     <td className="p-5">
                       <div className="bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-mono break-all max-w-[200px] text-slate-600 border border-slate-200">
