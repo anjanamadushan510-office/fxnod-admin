@@ -7,15 +7,20 @@ import Link from "next/link";
 
 export default function AdminDepositsPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  const fetchDeposits = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await adminApi.getManualDeposits();
-      setDeposits(data);
+      const [depositsData, usersData] = await Promise.all([
+        adminApi.getManualDeposits(),
+        adminApi.getUsers().catch(() => []) // fallback if users fail
+      ]);
+      setDeposits(depositsData);
+      setUsers(usersData);
     } catch (err: any) {
       setError(err.message || "Failed to load deposits");
     } finally {
@@ -24,7 +29,7 @@ export default function AdminDepositsPage() {
   };
 
   useEffect(() => {
-    fetchDeposits();
+    fetchData();
   }, []);
 
   const handleApprove = async (id: string) => {
@@ -34,7 +39,7 @@ export default function AdminDepositsPage() {
       setProcessingId(id);
       await adminApi.approveManualDeposit(id);
       alert("Deposit approved successfully!");
-      fetchDeposits();
+      fetchData();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || err.message));
     } finally {
@@ -50,7 +55,7 @@ export default function AdminDepositsPage() {
       setProcessingId(id);
       await adminApi.rejectManualDeposit(id, note);
       alert("Deposit rejected.");
-      fetchDeposits();
+      fetchData();
     } catch (err: any) {
       alert("Error: " + (err.response?.data?.detail || err.message));
     } finally {
@@ -78,7 +83,7 @@ export default function AdminDepositsPage() {
           <p className="text-navy-3 mt-1">Review and manage manual TRC-20 deposit requests.</p>
         </div>
         <button 
-          onClick={fetchDeposits} 
+          onClick={fetchData} 
           className="ml-auto text-sm bg-white border border-gray-200 px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition-all text-navy font-medium"
         >
           Refresh Data
@@ -91,7 +96,7 @@ export default function AdminDepositsPage() {
             <thead>
               <tr className="bg-slate-50 border-b border-gray-100 text-sm font-semibold text-slate-500 uppercase tracking-wider">
                 <th className="p-5">Date</th>
-                <th className="p-5">User ID</th>
+                <th className="p-5">User</th>
                 <th className="p-5">Amount</th>
                 <th className="p-5">TxHash</th>
                 <th className="p-5">Status</th>
@@ -106,13 +111,25 @@ export default function AdminDepositsPage() {
                   </td>
                 </tr>
               ) : (
-                deposits.map((dep) => (
+                deposits.map((dep) => {
+                  const user = users.find(u => u.id === dep.user_id);
+                  return (
                   <tr key={dep.id} className="border-b border-gray-50 last:border-none hover:bg-slate-50/50 transition-colors">
-                    <td className="p-5 text-navy-2">
+                    <td className="p-5 text-navy-2 whitespace-nowrap">
                       {new Date(dep.created_at).toLocaleString()}
                     </td>
-                    <td className="p-5 text-navy font-mono text-xs font-semibold">
-                      {dep.user_id}
+                    <td className="p-5">
+                      {user ? (
+                        <div>
+                          <div className="font-bold text-navy whitespace-nowrap">{user.full_name || 'N/A'}</div>
+                          <div className="text-xs text-navy-3">{user.email}</div>
+                          <div className="text-[10px] text-slate-400 font-mono mt-0.5" title="User ID">{dep.user_id.substring(0, 8)}...</div>
+                        </div>
+                      ) : (
+                        <div className="font-mono text-xs font-semibold text-navy">
+                          {dep.user_id}
+                        </div>
+                      )}
                     </td>
                     <td className="p-5 font-extrabold text-green-600 text-base">
                       ${Number(dep.amount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 8 })} {dep.currency}
