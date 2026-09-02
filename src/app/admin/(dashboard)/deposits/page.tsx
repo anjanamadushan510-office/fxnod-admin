@@ -178,7 +178,8 @@ export default function AdminDepositsPage() {
                       )}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
