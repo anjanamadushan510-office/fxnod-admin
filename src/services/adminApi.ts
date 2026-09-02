@@ -24,4 +24,16 @@ export const adminApi = {
     const res = await api.get<UserPublic>("/api/v1/auth/admin/me");
     return res.data;
   },
+  getManualDeposits: async () => {
+    const res = await api.get("/api/v1/admin/wallet/deposits/manual");
+    return res.data;
+  },
+  approveManualDeposit: async (id: string, note?: string) => {
+    const res = await api.post(`/api/v1/admin/wallet/deposits/manual/${id}/approve`, { admin_note: note });
+    return res.data;
+  },
+  rejectManualDeposit: async (id: string, note?: string) => {
+    const res = await api.post(`/api/v1/admin/wallet/deposits/manual/${id}/reject`, { admin_note: note });
+    return res.data;
+  },
 };
