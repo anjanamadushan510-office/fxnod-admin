@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { adminApi } from "@/services/adminApi";
-import { Check, X, Loader2, ArrowLeft } from "lucide-react";
+import { Check, X, Loader2, ArrowLeft, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function AdminDepositsPage() {
   const [deposits, setDeposits] = useState<any[]>([]);
@@ -11,6 +12,14 @@ export default function AdminDepositsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [processingId, setProcessingId] = useState<string | null>(null);
+
+  // Custom Modal State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    type: "approve" | "reject";
+    depositId: string;
+  } | null>(null);
+  const [rejectNote, setRejectNote] = useState("");
 
   const fetchData = async () => {
     try {
@@ -23,6 +32,7 @@ export default function AdminDepositsPage() {
       setUsers(usersData);
     } catch (err: any) {
       setError(err.message || "Failed to load deposits");
+      toast.error("Failed to load deposits data");
     } finally {
       setLoading(false);
     }
@@ -32,34 +42,28 @@ export default function AdminDepositsPage() {
     fetchData();
   }, []);
 
-  const handleApprove = async (id: string) => {
-    if (!window.confirm("Are you sure you want to approve this deposit and credit the user's wallet?")) return;
+  const executeAction = async () => {
+    if (!confirmModal) return;
+    const { type, depositId } = confirmModal;
     
     try {
-      setProcessingId(id);
-      await adminApi.approveManualDeposit(id);
-      alert("Deposit approved successfully!");
+      setProcessingId(depositId);
+      setConfirmModal(null); // Close modal immediately
+      
+      if (type === "approve") {
+        await adminApi.approveManualDeposit(depositId);
+        toast.success("Deposit approved successfully! User wallet credited.");
+      } else {
+        await adminApi.rejectManualDeposit(depositId, rejectNote);
+        toast.success("Deposit rejected successfully.");
+      }
+      
       fetchData();
     } catch (err: any) {
-      alert("Error: " + (err.response?.data?.detail || err.message));
+      toast.error("Error: " + (err.response?.data?.detail || err.message));
     } finally {
       setProcessingId(null);
-    }
-  };
-
-  const handleReject = async (id: string) => {
-    const note = window.prompt("Reason for rejection (optional):");
-    if (note === null) return; // User cancelled
-    
-    try {
-      setProcessingId(id);
-      await adminApi.rejectManualDeposit(id, note);
-      alert("Deposit rejected.");
-      fetchData();
-    } catch (err: any) {
-      alert("Error: " + (err.response?.data?.detail || err.message));
-    } finally {
-      setProcessingId(null);
+      setRejectNote(""); // reset note
     }
   };
 
@@ -72,8 +76,62 @@ export default function AdminDepositsPage() {
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6 relative">
       
+      {/* --- Custom Confirm Modal --- */}
+      {confirmModal?.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`p-3 rounded-full ${confirmModal.type === 'approve' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                {confirmModal.type === 'approve' ? <Check className="w-6 h-6" /> : <AlertCircle className="w-6 h-6" />}
+              </div>
+              <h2 className="text-xl font-bold text-navy">
+                {confirmModal.type === "approve" ? "Approve Deposit" : "Reject Deposit"}
+              </h2>
+            </div>
+            
+            <p className="text-slate-600 mb-6">
+              {confirmModal.type === "approve" 
+                ? "Are you sure you want to approve this deposit? The user's wallet will be instantly credited."
+                : "Are you sure you want to reject this deposit request?"}
+            </p>
+
+            {confirmModal.type === "reject" && (
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Reason for rejection (Optional)</label>
+                <input
+                  type="text"
+                  value={rejectNote}
+                  onChange={(e) => setRejectNote(e.target.value)}
+                  placeholder="e.g. Invalid TxHash"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gold focus:border-gold outline-none transition-all"
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => { setConfirmModal(null); setRejectNote(""); }}
+                className="px-5 py-2.5 rounded-xl font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={executeAction}
+                className={`px-5 py-2.5 rounded-xl font-semibold text-white transition-all shadow-sm ${
+                  confirmModal.type === "approve" 
+                    ? "bg-green-600 hover:bg-green-700 hover:shadow-md" 
+                    : "bg-red-600 hover:bg-red-700 hover:shadow-md"
+                }`}
+              >
+                {confirmModal.type === "approve" ? "Yes, Approve" : "Yes, Reject"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-4 mb-2">
         <Link href="/admin/dashboard" className="p-2 hover:bg-gray-100 rounded-full transition-colors text-navy-2">
           <ArrowLeft className="w-5 h-5" />
@@ -156,7 +214,7 @@ export default function AdminDepositsPage() {
                       {dep.status.toUpperCase() === "PENDING" && (
                         <>
                           <button
-                            onClick={() => handleApprove(dep.id)}
+                            onClick={() => setConfirmModal({ isOpen: true, type: "approve", depositId: dep.id })}
                             disabled={processingId === dep.id}
                             className="flex items-center gap-1.5 bg-green-50 text-green-700 hover:bg-green-600 hover:text-white px-4 py-2 rounded-xl transition-all disabled:opacity-50 font-semibold shadow-sm"
                           >
@@ -164,7 +222,7 @@ export default function AdminDepositsPage() {
                             Approve
                           </button>
                           <button
-                            onClick={() => handleReject(dep.id)}
+                            onClick={() => setConfirmModal({ isOpen: true, type: "reject", depositId: dep.id })}
                             disabled={processingId === dep.id}
                             className="flex items-center gap-1.5 bg-red-50 text-red-700 hover:bg-red-600 hover:text-white px-4 py-2 rounded-xl transition-all disabled:opacity-50 font-semibold shadow-sm"
                           >
