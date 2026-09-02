@@ -198,17 +198,24 @@ export default function AdminDepositsPage() {
                       </div>
                     </td>
                     <td className="p-5">
-                      <span
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide ${
-                          dep.status.toUpperCase() === "PENDING"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : dep.status.toUpperCase() === "APPROVED"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {dep.status.toUpperCase()}
-                      </span>
+                      <div className="flex flex-col items-start gap-1">
+                        <span
+                          className={`px-3 py-1.5 rounded-full text-xs font-bold tracking-wide ${
+                            dep.status.toUpperCase() === "PENDING"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : dep.status.toUpperCase() === "APPROVED"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {dep.status.toUpperCase()}
+                        </span>
+                        {dep.admin_note && (
+                          <div className="text-[11px] text-slate-500 max-w-[150px] leading-tight mt-1">
+                            <span className="font-semibold text-slate-700">Note:</span> {dep.admin_note}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="p-5 flex justify-end gap-2">
                       {dep.status.toUpperCase() === "PENDING" && (
