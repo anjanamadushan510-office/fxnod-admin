@@ -51,3 +51,87 @@ export const adminApi = {
     return res.data;
   },
 };
+
+/**
+ * Subscriptions — read-only.
+ *
+ * There is no grant or revoke here because the API has no such route. Whatever
+ * would authorise one becomes a way to mint free access remotely, so that stays
+ * a deliberate act on a host shell (`python -m app.subscription_cli`). The
+ * console shows what is true; it does not change it.
+ */
+export interface AdminSubscriptionRow {
+  user_id: string;
+  subscription_id: string;
+  product: string;
+  status: string;
+  current_plan_id: string;
+  /** The COMPUTED answer, from the same function the trading engine uses.
+   *  Read this rather than `status`, which can say "active" past its expiry. */
+  entitled: boolean;
+  reason: string;
+  started_at: string;
+  expires_at: string | null;
+  is_lifetime: boolean;
+  /** Decimal string. "0" for a granted subscription — nobody paid for it. */
+  paid_total: string;
+  purchase_count: number;
+  last_purchase_at: string | null;
+}
+
+export interface AdminSubscriptionPurchase {
+  purchase_id: string;
+  plan_id: string;
+  price_usd: string;
+  currency: string;
+  granted_days: number | null;
+  expires_at_after: string | null;
+  wallet_transaction_id: string;
+  created_at: string;
+}
+
+export interface AdminSubscriptionSummary {
+  product: string;
+  entitled_count: number;
+  lifetime_count: number;
+  expired_count: number;
+  cancelled_count: number;
+  /** Entitled with no purchase behind it — comped or seeded. */
+  granted_count: number;
+  total_revenue: string;
+  revenue_by_plan: { plan_id: string; purchase_count: number; revenue: string }[];
+  expiring_within_7_days: number;
+}
+
+export type SubscriptionFilterState = "all" | "entitled" | "expired" | "cancelled";
+
+export const subscriptionsApi = {
+  summary: async (product = "dbot") => {
+    const res = await api.get<AdminSubscriptionSummary>(
+      "/api/v1/admin/subscriptions/summary",
+      { params: { product } },
+    );
+    return res.data;
+  },
+  list: async (params: {
+    product?: string;
+    state?: SubscriptionFilterState;
+    user_id?: string;
+    limit?: number;
+    offset?: number;
+  }) => {
+    const res = await api.get<{ items: AdminSubscriptionRow[]; total: number }>(
+      "/api/v1/admin/subscriptions",
+      { params: { product: "dbot", ...params } },
+    );
+    return res.data;
+  },
+  detail: async (userId: string, product = "dbot") => {
+    const res = await api.get<{
+      user_id: string;
+      subscription: AdminSubscriptionRow | null;
+      purchases: AdminSubscriptionPurchase[];
+    }>(`/api/v1/admin/subscriptions/${userId}`, { params: { product } });
+    return res.data;
+  },
+};
