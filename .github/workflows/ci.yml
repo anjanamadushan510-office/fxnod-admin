@@ -1,0 +1,52 @@
+# Admin console CI.
+#
+# This repository has had no CI. The only workflow runs GitHub shows for it are
+# from an orphaned commit that is not in this history — leftovers from how the
+# repo was first created — so nothing has ever checked that a commit here
+# type-checks or builds.
+#
+# It matters more here than in the customer app: this console approves
+# withdrawals and credits wallets, and it is the one surface where a broken
+# build means an operator cannot act on real money.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+jobs:
+  verify:
+    name: Typecheck, lint & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      # Strict, with no `|| npm install` fallback: that would let a
+      # package.json/lockfile mismatch resolve to whatever is newest instead of
+      # failing, which is how CI goes green and the deploy goes red.
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      # src/lib/env.ts throws at build time when these are unset — correct for
+      # a deployment, and it means a build cannot run without them.
+      # Placeholders on purpose: CI compiles and type-checks, it does not
+      # deploy or talk to anything. The real values come from the host's own
+      # environment settings.
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_URL: https://admin-api.invalid
+          NEXT_PUBLIC_WS_URL: wss://admin-api.invalid
+        run: npm run build
