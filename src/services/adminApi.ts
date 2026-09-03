@@ -28,8 +28,22 @@ export const adminApi = {
     const res = await api.get("/api/v1/admin/deposits/manual");
     return res.data;
   },
-  approveManualDeposit: async (id: string, note?: string) => {
-    const res = await api.post(`/api/v1/admin/deposits/manual/${id}/approve`, { admin_note: note });
+  /**
+   * Approve a manual deposit claim and credit the wallet.
+   *
+   * `verifiedAmount` is what the reviewer actually saw on chain. Omitting it
+   * credits the amount the USER typed, which nobody has checked — so the
+   * console always asks for it, and leaving it blank is a deliberate choice
+   * recorded against the reviewer.
+   */
+  approveManualDeposit: async (
+    id: string,
+    payload?: { note?: string; verifiedAmount?: string },
+  ) => {
+    const res = await api.post(`/api/v1/admin/deposits/manual/${id}/approve`, {
+      admin_note: payload?.note,
+      verified_amount: payload?.verifiedAmount || undefined,
+    });
     return res.data;
   },
   rejectManualDeposit: async (id: string, note?: string) => {

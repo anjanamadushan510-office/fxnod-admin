@@ -18,8 +18,15 @@ export default function AdminDepositsPage() {
     isOpen: boolean;
     type: "approve" | "reject";
     depositId: string;
+    claimedAmount?: string;
+    txHash?: string;
+    currency?: string;
   } | null>(null);
   const [rejectNote, setRejectNote] = useState("");
+  // The amount the reviewer confirmed on chain. Pre-filled with the user's
+  // claim so the common case is one click, but editable because the claim is
+  // the one number in this flow nobody has verified.
+  const [verifiedAmount, setVerifiedAmount] = useState("");
 
   const fetchData = async () => {
     try {
@@ -51,19 +58,20 @@ export default function AdminDepositsPage() {
       setConfirmModal(null); // Close modal immediately
       
       if (type === "approve") {
-        await adminApi.approveManualDeposit(depositId);
+        await adminApi.approveManualDeposit(depositId, { verifiedAmount });
         toast.success("Deposit approved successfully! User wallet credited.");
       } else {
         await adminApi.rejectManualDeposit(depositId, rejectNote);
         toast.success("Deposit rejected successfully.");
       }
-      
+
       fetchData();
     } catch (err: any) {
       toast.error("Error: " + (err.response?.data?.detail || err.message));
     } finally {
       setProcessingId(null);
       setRejectNote(""); // reset note
+      setVerifiedAmount("");
     }
   };
 
@@ -91,11 +99,53 @@ export default function AdminDepositsPage() {
               </h2>
             </div>
             
-            <p className="text-slate-600 mb-6">
-              {confirmModal.type === "approve" 
-                ? "Are you sure you want to approve this deposit? The user's wallet will be instantly credited."
+            <p className="text-slate-600 mb-4">
+              {confirmModal.type === "approve"
+                ? "Check the transaction on chain before approving. The wallet is credited instantly and the ledger is append-only, so a wrong amount has to be corrected with a compensating entry."
                 : "Are you sure you want to reject this deposit request?"}
             </p>
+
+            {confirmModal.type === "approve" && (
+              <div className="mb-6 space-y-4">
+                {/* Everything needed to look the transaction up, so the
+                    reviewer is not switching tabs to find the hash. */}
+                <div className="rounded-xl bg-slate-50 p-3 text-sm">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-slate-500">User claims</span>
+                    <span className="font-semibold text-navy">
+                      {confirmModal.claimedAmount} {confirmModal.currency}
+                    </span>
+                  </div>
+                  <div className="text-slate-500 mb-1">Transaction</div>
+                  <a
+                    href={`https://tronscan.org/#/transaction/${confirmModal.txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs break-all text-gold hover:underline"
+                  >
+                    {confirmModal.txHash}
+                  </a>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Amount confirmed on chain
+                  </label>
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={verifiedAmount}
+                    onChange={(e) => setVerifiedAmount(e.target.value)}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gold focus:border-gold outline-none transition-all"
+                  />
+                  <p className="mt-2 text-xs text-slate-500">
+                    This is what gets credited. It is pre-filled with the
+                    user&apos;s figure — change it if the chain says otherwise.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {confirmModal.type === "reject" && (
               <div className="mb-6">
@@ -221,7 +271,17 @@ export default function AdminDepositsPage() {
                       {dep.status.toUpperCase() === "PENDING" && (
                         <>
                           <button
-                            onClick={() => setConfirmModal({ isOpen: true, type: "approve", depositId: dep.id })}
+                            onClick={() => {
+                              setVerifiedAmount(String(dep.amount));
+                              setConfirmModal({
+                                isOpen: true,
+                                type: "approve",
+                                depositId: dep.id,
+                                claimedAmount: String(dep.amount),
+                                txHash: dep.tx_hash,
+                                currency: dep.currency,
+                              });
+                            }}
                             disabled={processingId === dep.id}
                             className="flex items-center gap-1.5 bg-green-50 text-green-700 hover:bg-green-600 hover:text-white px-4 py-2 rounded-xl transition-all disabled:opacity-50 font-semibold shadow-sm"
                           >
