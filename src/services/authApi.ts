@@ -18,8 +18,6 @@ export interface UserPublic {
   is_active: boolean;
   role: string;
   kyc_status: string;
-  dbot_access_status: string;
-  dbot_receipt_url: string | null;
   created_at: string;
   updated_at: string;
 }
