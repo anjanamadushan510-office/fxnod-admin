@@ -34,11 +34,14 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
         
         if (data.cover_image) {
           const apiUrl = env.apiUrl;
-          setPreviewUrl(
-            data.cover_image.startsWith('http') 
+          const resolvedUrl = data.cover_image.startsWith('http') 
               ? data.cover_image 
-              : `${apiUrl}${data.cover_image.startsWith('/') ? '' : '/'}${data.cover_image}`
-          );
+              : `${apiUrl}${data.cover_image.startsWith('/') ? '' : '/'}${data.cover_image}`;
+              
+          console.log("[Blog Edit] Resolved Cover Image URL:", resolvedUrl, "from raw:", data.cover_image, "with API:", apiUrl);
+          setPreviewUrl(resolvedUrl);
+        } else {
+          console.log("[Blog Edit] No cover image found for this blog post.");
         }
       })
       .catch((err) => {
