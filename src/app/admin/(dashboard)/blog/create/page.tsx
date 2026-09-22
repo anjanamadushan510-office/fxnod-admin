@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Save, X } from "lucide-react";
+import { toast } from "sonner";
 import { adminApi } from "@/services/adminApi";
 
 export default function CreateBlogPage() {
@@ -36,11 +37,11 @@ export default function CreateBlogPage() {
     
     try {
       await adminApi.createBlog(formData);
-      alert("Post published successfully!");
+      toast.success("Post created successfully!");
       router.push("/admin/blog");
     } catch (error) {
-      console.error("Failed to publish blog", error);
-      alert("Failed to publish the post. Check console.");
+      console.error("Failed to create blog", error);
+      toast.error("Failed to create the post. Check console.");
       setIsSubmitting(false);
     }
   };

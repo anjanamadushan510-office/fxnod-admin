@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 import { useEffect, useState } from "react";
 import { adminApi } from "@/services/adminApi";
@@ -25,25 +26,36 @@ export default function BlogManagementPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this blog post?")) return;
-    try {
-      await adminApi.deleteBlog(id);
-      setBlogs(blogs.filter(b => b.id !== id));
-      alert("Blog post deleted successfully.");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to delete blog post.");
-    }
+  const handleDelete = (id: string) => {
+    toast('Are you sure you want to delete this blog post?', {
+      action: {
+        label: 'Delete',
+        onClick: async () => {
+          try {
+            await adminApi.deleteBlog(id);
+            setBlogs((prev) => prev.filter(b => b.id !== id));
+            toast.success("Blog post deleted successfully.");
+          } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete blog post.");
+          }
+        }
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {}
+      }
+    });
   };
 
   const handleToggleVisibility = async (id: string) => {
     try {
       const updatedBlog = await adminApi.toggleBlogVisibility(id);
-      setBlogs(blogs.map(b => b.id === id ? { ...b, status: updatedBlog.status } : b));
+      setBlogs((prev) => prev.map(b => b.id === id ? { ...b, status: updatedBlog.status } : b));
+      toast.success(`Post ${updatedBlog.status === 'published' ? 'published' : 'hidden'}.`);
     } catch (err) {
       console.error(err);
-      alert("Failed to toggle visibility.");
+      toast.error("Failed to toggle visibility.");
     }
   };
 

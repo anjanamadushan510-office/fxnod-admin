@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Save, X } from "lucide-react";
+import { toast } from "sonner";
 import { adminApi } from "@/services/adminApi";
 
 export default function EditBlogPage({ params }: { params: { id: string } }) {
@@ -40,7 +41,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
       })
       .catch((err) => {
         console.error("Failed to fetch blog", err);
-        alert("Failed to load blog post.");
+        toast.error("Failed to load blog post.");
         router.push("/admin/blog");
       })
       .finally(() => setIsLoading(false));
@@ -74,11 +75,11 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
     
     try {
       await adminApi.updateBlog(params.id, formData);
-      alert("Post updated successfully!");
+      toast.success("Post updated successfully!");
       router.push("/admin/blog");
     } catch (error) {
       console.error("Failed to update blog", error);
-      alert("Failed to update the post. Check console.");
+      toast.error("Failed to update the post. Check console.");
       setIsSubmitting(false);
     }
   };
