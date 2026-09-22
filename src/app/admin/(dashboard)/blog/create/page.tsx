@@ -1,14 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Upload, Save } from "lucide-react";
+import { ArrowLeft, Upload, Save, X } from "lucide-react";
 import { adminApi } from "@/services/adminApi";
 
 export default function CreateBlogPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,17 +112,31 @@ export default function CreateBlogPage() {
 
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-navy">Cover Image</label>
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+          <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden h-48 flex items-center justify-center">
             <input 
               type="file" 
               id="coverImage" 
               name="coverImage" 
               accept="image/*"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={handleFileChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             />
-            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-            <p className="text-sm font-medium text-navy">Click to upload or drag and drop</p>
-            <p className="text-xs text-gray-500 mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+            {previewUrl ? (
+              <div className="absolute inset-0 w-full h-full">
+                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                  <p className="text-white font-medium flex items-center gap-2">
+                    <Upload className="w-5 h-5" /> Change Image
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center pointer-events-none">
+                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm font-medium text-navy">Click to upload or drag and drop</p>
+                <p className="text-xs text-gray-500 mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+              </div>
+            )}
           </div>
         </div>
 
