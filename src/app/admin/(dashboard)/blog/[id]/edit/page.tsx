@@ -32,7 +32,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
         setTags(data.tags && data.tags.length > 0 ? data.tags[0] : "PRODUCT");
         
         if (data.cover_image) {
-          const apiUrl = (env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
+          const apiUrl = env.apiUrl;
           setPreviewUrl(
             data.cover_image.startsWith('http') 
               ? data.cover_image 
