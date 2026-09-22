@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { adminApi } from "@/services/adminApi";
@@ -24,6 +24,28 @@ export default function BlogManagementPage() {
       .catch((err) => console.error("Failed to fetch blogs", err))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this blog post?")) return;
+    try {
+      await adminApi.deleteBlog(id);
+      setBlogs(blogs.filter(b => b.id !== id));
+      alert("Blog post deleted successfully.");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete blog post.");
+    }
+  };
+
+  const handleToggleVisibility = async (id: string) => {
+    try {
+      const updatedBlog = await adminApi.toggleBlogVisibility(id);
+      setBlogs(blogs.map(b => b.id === id ? { ...b, status: updatedBlog.status } : b));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to toggle visibility.");
+    }
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -81,10 +103,23 @@ export default function BlogManagementPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3">
-                      <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50">
-                        <Edit className="w-4 h-4" />
+                      <button 
+                        onClick={() => handleToggleVisibility(blog.id)}
+                        className="p-2 text-gray-400 hover:text-emerald-600 transition-colors rounded-lg hover:bg-emerald-50"
+                        title={blog.status === 'published' ? 'Hide Post' : 'Publish Post'}
+                      >
+                        {blog.status === 'published' ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                      <Link 
+                        href={`/admin/blog/${blog.id}/edit`}
+                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Link>
+                      <button 
+                        onClick={() => handleDelete(blog.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>

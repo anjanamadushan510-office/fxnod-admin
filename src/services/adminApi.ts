@@ -50,10 +50,28 @@ export const adminApi = {
     const res = await api.get("/api/v1/admin/blogs");
     return res.data;
   },
+  getBlog: async (id: string) => {
+    const res = await api.get(`/api/v1/admin/blogs/${id}`);
+    return res.data;
+  },
   createBlog: async (data: FormData) => {
     const res = await api.post("/api/v1/admin/blogs", data, {
       headers: { "Content-Type": "multipart/form-data" },
     });
+    return res.data;
+  },
+  updateBlog: async (id: string, data: FormData) => {
+    const res = await api.put(`/api/v1/admin/blogs/${id}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  },
+  deleteBlog: async (id: string) => {
+    const res = await api.delete(`/api/v1/admin/blogs/${id}`);
+    return res.data;
+  },
+  toggleBlogVisibility: async (id: string) => {
+    const res = await api.patch(`/api/v1/admin/blogs/${id}/visibility`);
     return res.data;
   },
 };
