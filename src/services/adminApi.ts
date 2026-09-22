@@ -46,6 +46,16 @@ export const adminApi = {
     const res = await api.post(`/api/v1/admin/deposits/manual/${id}/reject`, { admin_note: note });
     return res.data;
   },
+  getBlogs: async () => {
+    const res = await api.get("/api/v1/admin/blogs");
+    return res.data;
+  },
+  createBlog: async (data: FormData) => {
+    const res = await api.post("/api/v1/admin/blogs", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data;
+  },
 };
 
 /**

@@ -1,29 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Save } from "lucide-react";
+import { adminApi } from "@/services/adminApi";
 
 export default function CreateBlogPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
+    formData.append("status", "published");
     
-    // Console log the entries
-    console.log("--- Form Data Submitted ---");
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
+    try {
+      await adminApi.createBlog(formData);
+      alert("Post published successfully!");
+      router.push("/admin/blog");
+    } catch (error) {
+      console.error("Failed to publish blog", error);
+      alert("Failed to publish the post. Check console.");
+      setIsSubmitting(false);
     }
-    
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    alert("Form submitted! Check console for FormData output.");
-    setIsSubmitting(false);
   };
 
   return (
@@ -68,8 +70,8 @@ export default function CreateBlogPage() {
         <div className="space-y-2">
           <label htmlFor="tag" className="block text-sm font-semibold text-navy">Category Tag</label>
           <select 
-            id="tag" 
-            name="tag"
+            id="tags" 
+            name="tags"
             className="w-full md:w-1/2 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-navy focus:outline-none focus:ring-2 focus:ring-gold/50 transition-all"
           >
             <option value="PRODUCT">PRODUCT</option>

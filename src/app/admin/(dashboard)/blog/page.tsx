@@ -3,13 +3,28 @@
 import Link from "next/link";
 import { Plus, Edit, Trash2 } from "lucide-react";
 
-const mockBlogs = [
-  { id: "1", title: "How FXNOD Bot runs strategies on Deriv", slug: "fxnod-bot-strategies", status: "Published", date: "11 SEP 2026" },
-  { id: "2", title: "Send FXNOD Wallet funds onto Deriv", slug: "send-wallet-funds", status: "Draft", date: "11 SEP 2026" },
-  { id: "3", title: "Free API markup vs monthly wallet plans", slug: "free-vs-monthly", status: "Published", date: "10 SEP 2026" },
-];
+import { useEffect, useState } from "react";
+import { adminApi } from "@/services/adminApi";
+
+interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  created_at: string;
+}
 
 export default function BlogManagementPage() {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    adminApi.getBlogs()
+      .then((data) => setBlogs(data))
+      .catch((err) => console.error("Failed to fetch blogs", err))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -35,23 +50,36 @@ export default function BlogManagementPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {mockBlogs.map((blog) => (
-                <tr key={blog.id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-navy">{blog.title}</div>
-                    <div className="text-sm text-gray-500 mt-1">/{blog.slug}</div>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                    Loading blogs...
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                      blog.status === 'Published' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                    }`}>
-                      {blog.status}
-                    </span>
+                </tr>
+              ) : blogs.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                    No blogs found. Create one!
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {blog.date}
-                  </td>
-                  <td className="px-6 py-4 text-right">
+                </tr>
+              ) : (
+                blogs.map((blog) => (
+                  <tr key={blog.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-navy">{blog.title}</div>
+                      <div className="text-sm text-gray-500 mt-1">/{blog.slug}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                        blog.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {blog.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {new Date(blog.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-3">
                       <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors rounded-lg hover:bg-blue-50">
                         <Edit className="w-4 h-4" />
@@ -62,7 +90,7 @@ export default function BlogManagementPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>
