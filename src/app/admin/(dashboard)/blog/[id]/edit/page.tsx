@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Upload, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { adminApi } from "@/services/adminApi";
+import { env } from "@/lib/env";
 
 export default function EditBlogPage({ params }: { params: { id: string } }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +32,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
         setTags(data.tags && data.tags.length > 0 ? data.tags[0] : "PRODUCT");
         
         if (data.cover_image) {
-          const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
+          const apiUrl = (env.NEXT_PUBLIC_API_URL || "").replace(/\/+$/, "");
           setPreviewUrl(
             data.cover_image.startsWith('http') 
               ? data.cover_image 
@@ -175,7 +176,12 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
             {previewUrl ? (
               <div className="absolute inset-0 w-full h-full">
                 <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                
+                <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-semibold px-2.5 py-1 rounded-md shadow-sm z-20 pointer-events-none">
+                  {previewUrl.startsWith('blob:') ? 'New Preview' : 'Current Cover Image'}
+                </div>
+
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10">
                   <p className="text-white font-medium flex items-center gap-2">
                     <Upload className="w-5 h-5" /> Change Image
                   </p>
