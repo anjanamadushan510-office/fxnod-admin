@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Save, X } from "lucide-react";
@@ -12,6 +12,7 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Form fields
   const [title, setTitle] = useState("");
@@ -164,14 +165,18 @@ export default function EditBlogPage({ params }: { params: { id: string } }) {
 
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-navy">Cover Image</label>
-          <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden h-48 flex items-center justify-center">
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden h-48 flex items-center justify-center"
+          >
             <input 
               type="file" 
               id="coverImage" 
               name="coverImage" 
               accept="image/*"
               onChange={handleFileChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              ref={fileInputRef}
+              className="hidden"
             />
             {previewUrl ? (
               <div className="absolute inset-0 w-full h-full">
