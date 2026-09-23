@@ -25,11 +25,12 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
+import type { BotRunScanType } from './botRunScanType';
 import type { BotRunStatus } from './botRunStatus';
 import type { BotRunStopReason } from './botRunStopReason';
 import type { BotContractTemplate } from './botContractTemplate';
@@ -44,7 +45,10 @@ export interface BotRun {
   deriv_account_id?: string;
   /** Snapshotted at start; a run cannot migrate between demo and real. */
   is_virtual: boolean;
-  symbol: string;
+  /** Every market the run trades, as Deriv symbols. A run used to trade one symbol; since multi-market runs this is the full set.
+ */
+  symbols: string[];
+  scan_type: BotRunScanType;
   currency: string;
   status: BotRunStatus;
   stop_reason?: BotRunStopReason;

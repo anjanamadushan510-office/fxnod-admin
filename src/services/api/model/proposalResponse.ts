@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -48,16 +48,12 @@ export interface ProposalResponse {
   high_barrier?: string;
   /** Lower barrier for two-barrier contracts. */
   low_barrier?: string;
-  /** Accumulators — barrier width as a percentage of spot. */
+  /** Accumulators â€” barrier width as a percentage of spot. */
   tick_size_barrier_percentage?: string;
-  /** Accumulators — how many ticks recent contracts survived. */
+  /** Accumulators â€” how many ticks recent contracts survived. */
   ticks_stayed_in?: number[];
-  /** Accumulators — the contract's tick ceiling. */
+  /** Accumulators â€” the contract's tick ceiling. */
   maximum_ticks?: number;
-  /** Vanillas — number of contracts, used as the payout figure. */
+  /** Vanillas â€” number of contracts, used as the payout figure. */
   display_number_of_contracts?: string;
-  /** Multipliers — commission fee charged by Deriv. */
-  commission?: DecimalString;
-  /** Multipliers — spot level at which the contract will be forced to close. */
-  stop_out_level?: DecimalString;
 }

@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -330,7 +330,7 @@ export const useVerifyEmail = <TError = ErrorType<Error | ValidationErrorRespons
     }
     /**
  * Confirms an account using the 6-digit code emailed at registration and
-establishes a session — returns an access/refresh token pair and sets
+establishes a session â€” returns an access/refresh token pair and sets
 the httpOnly refresh cookie, same shape as login. Runs alongside the
 magic-link flow; either verifies the account. Rate-limited per client
 IP; failure responses are uniform to prevent account enumeration.
@@ -603,7 +603,7 @@ export const useLogout = <TError = ErrorType<unknown>,
  * PUBLIC (no bearer). Mints an FXNod session from a Deriv OAuth token:
 validates the OAuth `state`, finds-or-creates the FXNod user keyed by the
 Deriv account, stores the encrypted Deriv token (account linking), sets
-the httpOnly refresh cookie, and returns an access token — same session
+the httpOnly refresh cookie, and returns an access token â€” same session
 shape as /api/v1/auth/login.
 
  * @summary Log in with Deriv OAuth

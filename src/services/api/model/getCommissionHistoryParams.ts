@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -39,6 +39,17 @@ status?: CommissionStatus;
  * @pattern ^\d{4}-\d{2}$
  */
 period?: string;
+/**
+ * Narrow to one product. Filtering here rather than in the client means a partner can page through "just my dBot rows" without the browser holding the whole ledger to sift it.
+ * @maxLength 32
+ */
+source_type?: string;
+/**
+ * 1 = own referral, 2 = master share.
+ * @minimum 1
+ * @maximum 10
+ */
+level?: number;
 /**
  * @minimum 1
  * @maximum 500

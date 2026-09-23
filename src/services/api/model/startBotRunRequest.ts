@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -34,6 +34,7 @@ import type { BotContractTemplate } from './botContractTemplate';
 import type { StartBotRunRequestStrategyParameters } from './startBotRunRequestStrategyParameters';
 import type { BotIndicator } from './botIndicator';
 import type { BotRiskLimits } from './botRiskLimits';
+import type { StartBotRunRequestScanType } from './startBotRunRequestScanType';
 
 export interface StartBotRunRequest {
   strategy_id: string;
@@ -47,4 +48,5 @@ export interface StartBotRunRequest {
   /** Required on a REAL-money account. Recorded with a timestamp; the schema itself refuses a real-money run without it.
  */
   risk_acknowledged?: boolean;
+  scan_type?: StartBotRunRequestScanType;
 }

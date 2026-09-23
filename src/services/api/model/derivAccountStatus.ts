@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -36,4 +36,9 @@ export interface DerivAccountStatus {
   deriv_account_id?: string;
   currency?: string;
   is_virtual: boolean;
+  connection_id?: string;
+  /** The account is still the user's choice, but the grant behind it has expired and trading needs a fresh authorisation. `linked` stays true because the account IS linked; conflating the two is what let the UI show Connected long after Deriv's hour-long token had died. */
+  needs_reconnect: boolean;
+  /** When the grant behind this account expires. */
+  expires_at?: string;
 }

@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -51,6 +51,8 @@ import type {
 
 import type {
   Error,
+  PartnerEarningsResponse,
+  PartnerListResponse,
   ReferralCodeResponse,
   ReferralStatsResponse,
   ReferralTreeResponse,
@@ -300,6 +302,200 @@ export function useGetReferralStats<TData = Awaited<ReturnType<typeof getReferra
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetReferralStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * The partner dashboard's headline. Two axes, because a partner asks two different questions: LEVEL is who they were to the earner (level 1 is someone they invited, level 2 is that person's invitee â€” what "master affiliate" means here, a position rather than a role), and SOURCE is what that person did.
+
+`matrix` is the finest cut; `by_level`, `by_source` and `total` are folds of exactly it, so a breakdown can never contradict the headline. Every figure is already summed server-side: the client renders these and must never add them up, because parsing decimal strings to add them in JavaScript turns commission into a float.
+
+`source_type` is open. A client that meets an unrecognised value should display it rather than drop it â€” the money is real either way, and new paid products are expected to appear here without a release.
+ * @summary The caller's commission, cut by level and by product
+ */
+export const getPartnerEarnings = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<PartnerEarningsResponse>(
+      {url: `/api/v1/referrals/earnings`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetPartnerEarningsQueryKey = () => {
+    return [
+    `/api/v1/referrals/earnings`
+    ] as const;
+    }
+
+    
+export const getGetPartnerEarningsQueryOptions = <TData = Awaited<ReturnType<typeof getPartnerEarnings>>, TError = ErrorType<UnauthorizedResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPartnerEarnings>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPartnerEarningsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPartnerEarnings>>> = ({ signal }) => getPartnerEarnings(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPartnerEarnings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPartnerEarningsQueryResult = NonNullable<Awaited<ReturnType<typeof getPartnerEarnings>>>
+export type GetPartnerEarningsQueryError = ErrorType<UnauthorizedResponse>
+
+
+export function useGetPartnerEarnings<TData = Awaited<ReturnType<typeof getPartnerEarnings>>, TError = ErrorType<UnauthorizedResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPartnerEarnings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPartnerEarnings>>,
+          TError,
+          Awaited<ReturnType<typeof getPartnerEarnings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPartnerEarnings<TData = Awaited<ReturnType<typeof getPartnerEarnings>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPartnerEarnings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPartnerEarnings>>,
+          TError,
+          Awaited<ReturnType<typeof getPartnerEarnings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPartnerEarnings<TData = Awaited<ReturnType<typeof getPartnerEarnings>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPartnerEarnings>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The caller's commission, cut by level and by product
+ */
+
+export function useGetPartnerEarnings<TData = Awaited<ReturnType<typeof getPartnerEarnings>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPartnerEarnings>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPartnerEarningsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Sorted by earnings, then by join date â€” "who is actually producing" is the question this list is opened to answer.
+
+Email is full at level 1, whom the partner invited personally, and masked below it. A partner's invitee's invitee is a stranger to them, and a working address is enough to contact one.
+
+Not paginated: the tree is capped at MAX_REFERRAL_DEPTH and a partner wants their whole team at once.
+ * @summary The caller's downline, and what each person has earned them
+ */
+export const listPartners = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<PartnerListResponse>(
+      {url: `/api/v1/referrals/partners`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getListPartnersQueryKey = () => {
+    return [
+    `/api/v1/referrals/partners`
+    ] as const;
+    }
+
+    
+export const getListPartnersQueryOptions = <TData = Awaited<ReturnType<typeof listPartners>>, TError = ErrorType<UnauthorizedResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPartners>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPartnersQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPartners>>> = ({ signal }) => listPartners(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPartners>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListPartnersQueryResult = NonNullable<Awaited<ReturnType<typeof listPartners>>>
+export type ListPartnersQueryError = ErrorType<UnauthorizedResponse>
+
+
+export function useListPartners<TData = Awaited<ReturnType<typeof listPartners>>, TError = ErrorType<UnauthorizedResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPartners>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPartners>>,
+          TError,
+          Awaited<ReturnType<typeof listPartners>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPartners<TData = Awaited<ReturnType<typeof listPartners>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPartners>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPartners>>,
+          TError,
+          Awaited<ReturnType<typeof listPartners>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPartners<TData = Awaited<ReturnType<typeof listPartners>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPartners>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The caller's downline, and what each person has earned them
+ */
+
+export function useListPartners<TData = Awaited<ReturnType<typeof listPartners>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPartners>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListPartnersQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

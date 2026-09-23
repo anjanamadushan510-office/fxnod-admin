@@ -25,11 +25,12 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
+import type { BotRiskLimitsStakeMode } from './botRiskLimitsStakeMode';
 
 /**
  * The session envelope. Amounts are decimal STRINGS, not JSON numbers: a stake of 0.1 through a float64 is 0.1000000000000000055, and these end up in NUMERIC columns and broker requests.
@@ -45,12 +46,20 @@ export interface BotRiskLimits {
   take_profit?: string;
   /** Per-contract limit order, distinct from session_stop_loss. */
   stop_loss?: string;
+  /** How the stake moves after each settled contract, per market. flat keeps it fixed; martingale multiplies after a loss; gentle_step adds one base stake after a loss and removes one after a win, never below the base; reverse_martingale multiplies after a win and resets after a loss. Absent, martingale_enabled chooses between martingale and flat, as it did before modes existed.
+ */
+  stake_mode?: BotRiskLimitsStakeMode;
+  /** Legacy switch, read only when stake_mode is absent. */
   martingale_enabled?: boolean;
-  /** Must exceed 1 when martingale is enabled; one that does not never recovers. */
+  /** The factor for the multiplying modes (martingale, reverse_martingale). Must exceed 1; gentle_step ignores it.
+ */
   martingale_multiplier?: string;
-  /** The ladder ENDS the run when exhausted rather than restarting at the base stake, which would hide an unrecovered loss.
+  /** Length of the ladder in every escalating mode. Exhausting it ENDS a martingale run rather than restarting at the base stake, which would hide an unrecovered loss; gentle_step and reverse_martingale reset to the base stake instead.
  */
   martingale_max_steps?: number;
+  /** The caller's own ceiling on one stake, applied on top of the platform cap (which still wins). At least stake_per_trade.
+ */
+  max_stake_per_trade?: string;
   max_trades?: number;
   max_duration_seconds?: number;
 }

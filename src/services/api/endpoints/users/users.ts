@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -50,13 +50,18 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  EmailUpdateConfirmRequest,
+  EmailUpdateRequest,
   Error,
   KYCStatusResponse,
   KYCSubmission,
+  PasswordVerifyRequest,
+  RequestEmailUpdate200,
   UnauthorizedResponse,
   UserPublic,
   UserUpdate,
-  ValidationErrorResponse
+  ValidationErrorResponse,
+  VerifyCurrentPassword200
 } from '../../model';
 
 import { customInstance } from '../../mutator/custom-instance';
@@ -220,6 +225,201 @@ export const useUpdateMe = <TError = ErrorType<UnauthorizedResponse | Validation
       > => {
 
       const mutationOptions = getUpdateMeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Verifies the current user's password before sensitive operations.
+ * @summary Verify current password
+ */
+export const verifyCurrentPassword = (
+    passwordVerifyRequest: BodyType<PasswordVerifyRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<VerifyCurrentPassword200>(
+      {url: `/api/v1/users/me/verify-password`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: passwordVerifyRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getVerifyCurrentPasswordMutationOptions = <TError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyCurrentPassword>>, TError,{data: BodyType<PasswordVerifyRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyCurrentPassword>>, TError,{data: BodyType<PasswordVerifyRequest>}, TContext> => {
+
+const mutationKey = ['verifyCurrentPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyCurrentPassword>>, {data: BodyType<PasswordVerifyRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  verifyCurrentPassword(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyCurrentPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof verifyCurrentPassword>>>
+    export type VerifyCurrentPasswordMutationBody = BodyType<PasswordVerifyRequest>
+    export type VerifyCurrentPasswordMutationError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>
+
+    /**
+ * @summary Verify current password
+ */
+export const useVerifyCurrentPassword = <TError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyCurrentPassword>>, TError,{data: BodyType<PasswordVerifyRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyCurrentPassword>>,
+        TError,
+        {data: BodyType<PasswordVerifyRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getVerifyCurrentPasswordMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Initiates an email update by sending an OTP to the new email address.
+ * @summary Request an email update
+ */
+export const requestEmailUpdate = (
+    emailUpdateRequest: BodyType<EmailUpdateRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<RequestEmailUpdate200>(
+      {url: `/api/v1/users/me/request-email-update`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: emailUpdateRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getRequestEmailUpdateMutationOptions = <TError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestEmailUpdate>>, TError,{data: BodyType<EmailUpdateRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestEmailUpdate>>, TError,{data: BodyType<EmailUpdateRequest>}, TContext> => {
+
+const mutationKey = ['requestEmailUpdate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestEmailUpdate>>, {data: BodyType<EmailUpdateRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestEmailUpdate(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestEmailUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof requestEmailUpdate>>>
+    export type RequestEmailUpdateMutationBody = BodyType<EmailUpdateRequest>
+    export type RequestEmailUpdateMutationError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>
+
+    /**
+ * @summary Request an email update
+ */
+export const useRequestEmailUpdate = <TError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestEmailUpdate>>, TError,{data: BodyType<EmailUpdateRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestEmailUpdate>>,
+        TError,
+        {data: BodyType<EmailUpdateRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getRequestEmailUpdateMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Verifies the OTP and finalizes the email update for the current user.
+ * @summary Confirm email update
+ */
+export const confirmEmailUpdate = (
+    emailUpdateConfirmRequest: BodyType<EmailUpdateConfirmRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UserPublic>(
+      {url: `/api/v1/users/me/confirm-email-update`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: emailUpdateConfirmRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getConfirmEmailUpdateMutationOptions = <TError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmEmailUpdate>>, TError,{data: BodyType<EmailUpdateConfirmRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmEmailUpdate>>, TError,{data: BodyType<EmailUpdateConfirmRequest>}, TContext> => {
+
+const mutationKey = ['confirmEmailUpdate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmEmailUpdate>>, {data: BodyType<EmailUpdateConfirmRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  confirmEmailUpdate(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmEmailUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof confirmEmailUpdate>>>
+    export type ConfirmEmailUpdateMutationBody = BodyType<EmailUpdateConfirmRequest>
+    export type ConfirmEmailUpdateMutationError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>
+
+    /**
+ * @summary Confirm email update
+ */
+export const useConfirmEmailUpdate = <TError = ErrorType<Error | UnauthorizedResponse | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmEmailUpdate>>, TError,{data: BodyType<EmailUpdateConfirmRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirmEmailUpdate>>,
+        TError,
+        {data: BodyType<EmailUpdateConfirmRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getConfirmEmailUpdateMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

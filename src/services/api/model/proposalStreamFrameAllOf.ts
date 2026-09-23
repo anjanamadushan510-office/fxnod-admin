@@ -25,14 +25,24 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
+import type { DecimalString } from './decimalString';
 
 export type ProposalStreamFrameAllOf = {
-  /** Turbos — the payout-per-point values Deriv currently offers. Streamed only; the REST proposal endpoint does not return it.
+  /** Turbos â€” the payout-per-point values Deriv currently offers. Streamed only; the REST proposal endpoint does not return it.
  */
   payout_choices?: string[];
+  /** Vanillas â€” the barrier (strike price) values Deriv currently offers for the selected symbol and duration. Streamed only; the REST proposal endpoint does not return it.
+ */
+  barrier_choices?: string[];
+  /** Multipliers â€” the commission Deriv charges on the contract. Streamed only, like payout_choices: emitted by the `out` map in ws.go and NOT returned by /orders/proposal. Declaring it on ProposalResponse would tell every REST caller to expect a field that never arrives.
+ */
+  commission?: DecimalString;
+  /** Multipliers â€” the spot at which the contract is force-closed. Streamed only, same as commission above.
+ */
+  stop_out_level?: DecimalString;
 };

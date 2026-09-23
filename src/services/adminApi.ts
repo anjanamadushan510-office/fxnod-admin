@@ -74,6 +74,14 @@ export const adminApi = {
     const res = await api.patch(`/api/v1/admin/blogs/${id}/visibility`);
     return res.data;
   },
+  getTickets: async () => {
+    const res = await api.get("/api/v1/admin/tickets");
+    return res.data;
+  },
+  updateTicketStatus: async (id: string, status: string) => {
+    const res = await api.patch(`/api/v1/admin/tickets/${id}`, { status });
+    return res.data;
+  },
 };
 
 /**

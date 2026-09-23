@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -35,7 +35,7 @@ import type { ProposalRequestTakeProfit } from './proposalRequestTakeProfit';
 import type { ProposalRequestStopLoss } from './proposalRequestStopLoss';
 
 export interface ProposalRequest {
-  /** Frontend id: rise_fall, accumulators, matches_differs, … */
+  /** Frontend id: rise_fall, accumulators, matches_differs, â€¦ */
   contract_type: string;
   /** "rise" / "fall" toggle; empty for accumulators. */
   side?: string;
@@ -56,7 +56,7 @@ export interface ProposalRequest {
   /** @nullable */
   multiplier?: number | null;
   /**
-   * Turbos — payout per point. Either this or `barrier` is supplied, not both; the handler rejects the combination. Was missing from this schema while the handler already accepted it.
+   * Turbos â€” payout per point. Either this or `barrier` is supplied, not both; the handler rejects the combination. Was missing from this schema while the handler already accepted it.
 
    * @nullable
    */

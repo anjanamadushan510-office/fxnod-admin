@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -44,6 +44,7 @@ export const BotRunStopReason = {
   account_session_loss: 'account_session_loss',
   martingale_steps_exhausted: 'martingale_steps_exhausted',
   entitlement_lapsed: 'entitlement_lapsed',
+  deriv_reconnect_required: 'deriv_reconnect_required',
   admin_halt: 'admin_halt',
   error: 'error',
 } as const;

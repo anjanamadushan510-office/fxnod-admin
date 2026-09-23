@@ -1,4 +1,4 @@
-import { ShieldAlert, LayoutDashboard, Cpu } from "lucide-react";
+import { ShieldAlert, LayoutDashboard, Cpu, LifeBuoy } from "lucide-react";
 import Link from "next/link";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 
@@ -39,6 +39,15 @@ export default function AdminLayout({
               <Cpu className="w-4 h-4" />
             </div>
             <span className="font-medium">dBot subscriptions</span>
+          </Link>
+          <Link
+            href={"/admin/tickets" as any}
+            className="flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-gold/10 transition-all duration-300 text-gold-soft hover:text-gold group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-gold/5 flex items-center justify-center group-hover:bg-gold/20 group-hover:text-gold transition-colors">
+              <LifeBuoy className="w-4 h-4" />
+            </div>
+            <span className="font-medium">Ticket Management</span>
           </Link>
           {/* User Management link removed as requested */}
         </nav>

@@ -25,13 +25,16 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
 import type { DecimalString } from './decimalString';
 import type { BotRunTradeOutcome } from './botRunTradeOutcome';
+import type { BotRunTradeEntrySpot } from './botRunTradeEntrySpot';
+import type { BotRunTradeExitSpot } from './botRunTradeExitSpot';
+import type { BotRunTradeTickStreamItem } from './botRunTradeTickStreamItem';
 
 /**
  * One trade a bot placed, shaped for the run's history table.
@@ -48,11 +51,17 @@ export interface BotRunTrade {
   currency: string;
   /** Absent while the contract is still open. */
   outcome?: BotRunTradeOutcome;
-  /** Realised P&L — payout minus stake. Absent while open: 0 would read as break-even rather than "not yet known".
+  /** Realised P&L â€” payout minus stake. Absent while open: 0 would read as break-even rather than "not yet known".
  */
   profit_loss?: DecimalString;
   /** The run's order number for this trade, from the intent that produced it. Stable and gap-free, which a timestamp is not.
  */
   sequence?: number;
   created_at: string;
+  /** @nullable */
+  entry_spot?: BotRunTradeEntrySpot;
+  /** @nullable */
+  exit_spot?: BotRunTradeExitSpot;
+  /** @nullable */
+  tick_stream?: BotRunTradeTickStreamItem[] | null;
 }

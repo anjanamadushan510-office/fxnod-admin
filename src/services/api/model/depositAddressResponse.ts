@@ -25,17 +25,23 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
+import type { DecimalString } from './decimalString';
 
 export interface DepositAddressResponse {
   id: string;
   user_id: string;
+  /** The user's own address, stable for this chain and currency. Derived from FXNod's watch-only key; safe to save and reuse. */
   address: string;
   chain: string;
   currency: string;
   created_at: string;
+  /** Deposits below this are recorded but not credited. */
+  min_deposit: DecimalString;
+  /** Block confirmations before the deposit is credited. */
+  required_confirmations: number;
 }

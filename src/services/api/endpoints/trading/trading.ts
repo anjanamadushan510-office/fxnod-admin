@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -50,18 +50,29 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AuthorizeResponse,
   ConfirmRequest,
   ConfirmResponse,
+  DerivAccountListResponse,
   DerivAccountStatus,
+  DerivAppConnectionList,
+  DerivAppExchangeRequest,
+  DerivAppExchangeResponse,
+  DerivConnectionListResponse,
+  DerivDisconnectResponse,
+  DerivExchangeRequest,
+  DerivExchangeResponse,
   DerivLinkRequest,
   DerivLinkResponse,
+  DerivSelectAccountRequest,
   DerivUnlink200,
   Error,
   ProposalRequest,
   ProposalResponse,
+  SellRequest,
+  SellResponse,
   TradeHistoryEntry,
-  UnauthorizedResponse
+  UnauthorizedResponse,
+  ValidationErrorResponse
 } from '../../model';
 
 import { customInstance } from '../../mutator/custom-instance';
@@ -73,99 +84,78 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary Build the Deriv OAuth authorize URL
+ * Step one of linking. Swaps the OAuth code for an access token, asks Deriv which accounts it covers, and STORES every one of them with the `is_virtual` flag Deriv gave it. The caller then picks which to trade via /oauth/link or /account/select.
+
+Storing the set here is what makes the rest safe: selecting an account can only choose from what Deriv confirmed, so no request can assert that a real account is virtual.
+
+The authorize URL itself is built client-side with PKCE â€” there is no server endpoint for it, and this spec used to document one that the router has never registered.
+
+Deriv's access token is NOT returned. It can trade the user's real account and nothing in the browser needs it; it used to be returned and posted back to /oauth/link, which ignored it.
+ * @summary Exchange a Deriv authorization code for the account list
  */
-export const derivAuthorize = (
-    
+export const derivExchangeCode = (
+    derivExchangeRequest: BodyType<DerivExchangeRequest>,
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
-      return customInstance<AuthorizeResponse>(
-      {url: `/api/v1/deriv/oauth/authorize`, method: 'GET', signal
+      return customInstance<DerivExchangeResponse>(
+      {url: `/api/v1/deriv/oauth/exchange`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: derivExchangeRequest, signal
     },
       options);
     }
   
 
 
+export const getDerivExchangeCodeMutationOptions = <TError = ErrorType<Error | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivExchangeCode>>, TError,{data: BodyType<DerivExchangeRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof derivExchangeCode>>, TError,{data: BodyType<DerivExchangeRequest>}, TContext> => {
 
-export const getDerivAuthorizeQueryKey = () => {
-    return [
-    `/api/v1/deriv/oauth/authorize`
-    ] as const;
-    }
-
-    
-export const getDerivAuthorizeQueryOptions = <TData = Awaited<ReturnType<typeof derivAuthorize>>, TError = ErrorType<UnauthorizedResponse | Error>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivAuthorize>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getDerivAuthorizeQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof derivAuthorize>>> = ({ signal }) => derivAuthorize(requestOptions, signal);
+const mutationKey = ['derivExchangeCode'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
-      
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof derivAuthorize>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof derivExchangeCode>>, {data: BodyType<DerivExchangeRequest>}> = (props) => {
+          const {data} = props ?? {};
 
-export type DerivAuthorizeQueryResult = NonNullable<Awaited<ReturnType<typeof derivAuthorize>>>
-export type DerivAuthorizeQueryError = ErrorType<UnauthorizedResponse | Error>
+          return  derivExchangeCode(data,requestOptions)
+        }
+
+        
 
 
-export function useDerivAuthorize<TData = Awaited<ReturnType<typeof derivAuthorize>>, TError = ErrorType<UnauthorizedResponse | Error>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivAuthorize>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof derivAuthorize>>,
-          TError,
-          Awaited<ReturnType<typeof derivAuthorize>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDerivAuthorize<TData = Awaited<ReturnType<typeof derivAuthorize>>, TError = ErrorType<UnauthorizedResponse | Error>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivAuthorize>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof derivAuthorize>>,
-          TError,
-          Awaited<ReturnType<typeof derivAuthorize>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDerivAuthorize<TData = Awaited<ReturnType<typeof derivAuthorize>>, TError = ErrorType<UnauthorizedResponse | Error>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivAuthorize>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Build the Deriv OAuth authorize URL
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DerivExchangeCodeMutationResult = NonNullable<Awaited<ReturnType<typeof derivExchangeCode>>>
+    export type DerivExchangeCodeMutationBody = BodyType<DerivExchangeRequest>
+    export type DerivExchangeCodeMutationError = ErrorType<Error | UnauthorizedResponse>
+
+    /**
+ * @summary Exchange a Deriv authorization code for the account list
  */
+export const useDerivExchangeCode = <TError = ErrorType<Error | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivExchangeCode>>, TError,{data: BodyType<DerivExchangeRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof derivExchangeCode>>,
+        TError,
+        {data: BodyType<DerivExchangeRequest>},
+        TContext
+      > => {
 
-export function useDerivAuthorize<TData = Awaited<ReturnType<typeof derivAuthorize>>, TError = ErrorType<UnauthorizedResponse | Error>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivAuthorize>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+      const mutationOptions = getDerivExchangeCodeMutationOptions(options);
 
-  const queryOptions = getDerivAuthorizeQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
-
-  return query;
-}
-
-
-
-
-/**
- * Stores the encrypted Deriv OAuth token for the chosen account.
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Selects which of the accounts stored by /oauth/exchange is traded. The token was stored at exchange time; this request carries none.
  * @summary Link a Deriv account
  */
 export const derivLink = (
@@ -226,6 +216,166 @@ export const useDerivLink = <TError = ErrorType<Error | UnauthorizedResponse>,
       > => {
 
       const mutationOptions = getDerivLinkMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Deriv issues one token for a whole Deriv login, so demo and real are both already linked after a single authorisation. This lists every account across every login the user has connected, flat, so the switcher can offer them all without sending anyone back through Deriv. `connection_id` says which login each belongs to.
+ * @summary Every Deriv account the user's live grants cover
+ */
+export const derivListAccounts = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DerivAccountListResponse>(
+      {url: `/api/v1/deriv/accounts`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDerivListAccountsQueryKey = () => {
+    return [
+    `/api/v1/deriv/accounts`
+    ] as const;
+    }
+
+    
+export const getDerivListAccountsQueryOptions = <TData = Awaited<ReturnType<typeof derivListAccounts>>, TError = ErrorType<UnauthorizedResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDerivListAccountsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof derivListAccounts>>> = ({ signal }) => derivListAccounts(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof derivListAccounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DerivListAccountsQueryResult = NonNullable<Awaited<ReturnType<typeof derivListAccounts>>>
+export type DerivListAccountsQueryError = ErrorType<UnauthorizedResponse>
+
+
+export function useDerivListAccounts<TData = Awaited<ReturnType<typeof derivListAccounts>>, TError = ErrorType<UnauthorizedResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListAccounts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivListAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof derivListAccounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivListAccounts<TData = Awaited<ReturnType<typeof derivListAccounts>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListAccounts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivListAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof derivListAccounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivListAccounts<TData = Awaited<ReturnType<typeof derivListAccounts>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Every Deriv account the user's live grants cover
+ */
+
+export function useDerivListAccounts<TData = Awaited<ReturnType<typeof derivListAccounts>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDerivListAccountsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Demo/real switching. A database flag, not another OAuth round-trip â€” the token already covers both, and re-authorising to change accounts is why switching felt broken.
+
+The response reports `is_virtual` as the SERVER has it, from what Deriv said when the account was linked. It is not taken from the request, and a request cannot change it: that field decides whether a bot run needs a paid subscription.
+ * @summary Switch which linked Deriv account is being traded
+ */
+export const derivSelectAccount = (
+    derivSelectAccountRequest: BodyType<DerivSelectAccountRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DerivAccountStatus>(
+      {url: `/api/v1/deriv/account/select`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: derivSelectAccountRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getDerivSelectAccountMutationOptions = <TError = ErrorType<UnauthorizedResponse | Error | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivSelectAccount>>, TError,{data: BodyType<DerivSelectAccountRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof derivSelectAccount>>, TError,{data: BodyType<DerivSelectAccountRequest>}, TContext> => {
+
+const mutationKey = ['derivSelectAccount'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof derivSelectAccount>>, {data: BodyType<DerivSelectAccountRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  derivSelectAccount(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DerivSelectAccountMutationResult = NonNullable<Awaited<ReturnType<typeof derivSelectAccount>>>
+    export type DerivSelectAccountMutationBody = BodyType<DerivSelectAccountRequest>
+    export type DerivSelectAccountMutationError = ErrorType<UnauthorizedResponse | Error | ValidationErrorResponse>
+
+    /**
+ * @summary Switch which linked Deriv account is being traded
+ */
+export const useDerivSelectAccount = <TError = ErrorType<UnauthorizedResponse | Error | ValidationErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivSelectAccount>>, TError,{data: BodyType<DerivSelectAccountRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof derivSelectAccount>>,
+        TError,
+        {data: BodyType<DerivSelectAccountRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getDerivSelectAccountMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -322,7 +472,165 @@ export function useDerivAccountStatus<TData = Awaited<ReturnType<typeof derivAcc
 
 
 /**
- * @summary Unlink the Deriv account
+ * One connection is one Deriv login, with the accounts its grant reaches underneath it. A user may hold several: a fresh authorisation supersedes only the connection whose accounts it overlaps, because a Deriv loginid belongs to exactly one Deriv login.
+
+Deriv issues our clients no refresh token, so every grant expires within about an hour and `needs_reconnect` is how the UI knows to offer the reconnect instead of a Connected badge that is no longer true.
+ * @summary Every Deriv login the user has authorised
+ */
+export const derivListConnections = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DerivConnectionListResponse>(
+      {url: `/api/v1/deriv/connections`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDerivListConnectionsQueryKey = () => {
+    return [
+    `/api/v1/deriv/connections`
+    ] as const;
+    }
+
+    
+export const getDerivListConnectionsQueryOptions = <TData = Awaited<ReturnType<typeof derivListConnections>>, TError = ErrorType<UnauthorizedResponse | Error>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListConnections>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDerivListConnectionsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof derivListConnections>>> = ({ signal }) => derivListConnections(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof derivListConnections>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DerivListConnectionsQueryResult = NonNullable<Awaited<ReturnType<typeof derivListConnections>>>
+export type DerivListConnectionsQueryError = ErrorType<UnauthorizedResponse | Error>
+
+
+export function useDerivListConnections<TData = Awaited<ReturnType<typeof derivListConnections>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListConnections>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivListConnections>>,
+          TError,
+          Awaited<ReturnType<typeof derivListConnections>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivListConnections<TData = Awaited<ReturnType<typeof derivListConnections>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListConnections>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivListConnections>>,
+          TError,
+          Awaited<ReturnType<typeof derivListConnections>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivListConnections<TData = Awaited<ReturnType<typeof derivListConnections>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListConnections>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Every Deriv login the user has authorised
+ */
+
+export function useDerivListConnections<TData = Awaited<ReturnType<typeof derivListConnections>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListConnections>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDerivListConnectionsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Revokes this grant, its accounts, and any dBot app consent that reaches them. A grant for a different Deriv login is untouched â€” that login is still connected. To remove every one of them, use DELETE /api/v1/deriv/oauth.
+ * @summary Disconnect one Deriv login
+ */
+export const derivDisconnect = (
+    connectionId: string,
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<DerivDisconnectResponse>(
+      {url: `/api/v1/deriv/connections/${connectionId}`, method: 'DELETE'
+    },
+      options);
+    }
+  
+
+
+export const getDerivDisconnectMutationOptions = <TError = ErrorType<UnauthorizedResponse | Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivDisconnect>>, TError,{connectionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof derivDisconnect>>, TError,{connectionId: string}, TContext> => {
+
+const mutationKey = ['derivDisconnect'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof derivDisconnect>>, {connectionId: string}> = (props) => {
+          const {connectionId} = props ?? {};
+
+          return  derivDisconnect(connectionId,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DerivDisconnectMutationResult = NonNullable<Awaited<ReturnType<typeof derivDisconnect>>>
+    
+    export type DerivDisconnectMutationError = ErrorType<UnauthorizedResponse | Error>
+
+    /**
+ * @summary Disconnect one Deriv login
+ */
+export const useDerivDisconnect = <TError = ErrorType<UnauthorizedResponse | Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivDisconnect>>, TError,{connectionId: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof derivDisconnect>>,
+        TError,
+        {connectionId: string},
+        TContext
+      > => {
+
+      const mutationOptions = getDerivDisconnectMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Every Deriv login, every account, every dBot app consent. To remove one login and keep the others, use DELETE /api/v1/deriv/connections/{connection_id}.
+ * @summary Disconnect Deriv entirely
  */
 export const derivUnlink = (
     
@@ -367,7 +675,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DerivUnlinkMutationError = ErrorType<UnauthorizedResponse | Error>
 
     /**
- * @summary Unlink the Deriv account
+ * @summary Disconnect Deriv entirely
  */
 export const useDerivUnlink = <TError = ErrorType<UnauthorizedResponse | Error>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivUnlink>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -379,6 +687,169 @@ export const useDerivUnlink = <TError = ErrorType<UnauthorizedResponse | Error>,
       > => {
 
       const mutationOptions = getDerivUnlinkMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Deriv bills markup per registered app and an OAuth token identifies the app it was granted to, so a real-money dBot run needs the user's grant for its strategy's app. One entry per app; `strategy_ids` says which bots use it. `connected` means a live grant covering the account the user has selected.
+
+`client_id` is public (it appears in every authorize URL) and is what the browser needs to send the user to Deriv. The markup is deliberately not exposed. Empty when per-app routing is not configured.
+ * @summary Deriv apps dBot trades through, and whether each is approved
+ */
+export const derivListApps = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DerivAppConnectionList>(
+      {url: `/api/v1/deriv/apps`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDerivListAppsQueryKey = () => {
+    return [
+    `/api/v1/deriv/apps`
+    ] as const;
+    }
+
+    
+export const getDerivListAppsQueryOptions = <TData = Awaited<ReturnType<typeof derivListApps>>, TError = ErrorType<UnauthorizedResponse | Error>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListApps>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDerivListAppsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof derivListApps>>> = ({ signal }) => derivListApps(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof derivListApps>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DerivListAppsQueryResult = NonNullable<Awaited<ReturnType<typeof derivListApps>>>
+export type DerivListAppsQueryError = ErrorType<UnauthorizedResponse | Error>
+
+
+export function useDerivListApps<TData = Awaited<ReturnType<typeof derivListApps>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListApps>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivListApps>>,
+          TError,
+          Awaited<ReturnType<typeof derivListApps>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivListApps<TData = Awaited<ReturnType<typeof derivListApps>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListApps>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivListApps>>,
+          TError,
+          Awaited<ReturnType<typeof derivListApps>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivListApps<TData = Awaited<ReturnType<typeof derivListApps>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListApps>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Deriv apps dBot trades through, and whether each is approved
+ */
+
+export function useDerivListApps<TData = Awaited<ReturnType<typeof derivListApps>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivListApps>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDerivListAppsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * Completes the one-time approval of a dBot app. The code is exchanged with that app's client id, looked up server-side from `app_key`; Deriv binds the code to the client it was issued for, so naming a different app than the one approved fails rather than filing a grant under the wrong markup.
+
+Refused with 409 when the user approved while signed in to Deriv as someone who does not hold their selected account.
+ * @summary Store the user's grant for one dBot app
+ */
+export const derivExchangeAppCode = (
+    appKey: string,
+    derivAppExchangeRequest: BodyType<DerivAppExchangeRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DerivAppExchangeResponse>(
+      {url: `/api/v1/deriv/apps/${appKey}/oauth/exchange`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: derivAppExchangeRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getDerivExchangeAppCodeMutationOptions = <TError = ErrorType<Error | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivExchangeAppCode>>, TError,{appKey: string;data: BodyType<DerivAppExchangeRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof derivExchangeAppCode>>, TError,{appKey: string;data: BodyType<DerivAppExchangeRequest>}, TContext> => {
+
+const mutationKey = ['derivExchangeAppCode'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof derivExchangeAppCode>>, {appKey: string;data: BodyType<DerivAppExchangeRequest>}> = (props) => {
+          const {appKey,data} = props ?? {};
+
+          return  derivExchangeAppCode(appKey,data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DerivExchangeAppCodeMutationResult = NonNullable<Awaited<ReturnType<typeof derivExchangeAppCode>>>
+    export type DerivExchangeAppCodeMutationBody = BodyType<DerivAppExchangeRequest>
+    export type DerivExchangeAppCodeMutationError = ErrorType<Error | UnauthorizedResponse>
+
+    /**
+ * @summary Store the user's grant for one dBot app
+ */
+export const useDerivExchangeAppCode = <TError = ErrorType<Error | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof derivExchangeAppCode>>, TError,{appKey: string;data: BodyType<DerivAppExchangeRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof derivExchangeAppCode>>,
+        TError,
+        {appKey: string;data: BodyType<DerivAppExchangeRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getDerivExchangeAppCodeMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -520,8 +991,8 @@ export const useConfirmProposal = <TError = ErrorType<Error | UnauthorizedRespon
  * Convenience endpoint that runs the proposal and buy steps back-to-back
 with no confirmation window. Same request body as /orders/proposal; same
 response as /orders/confirm. The buy is still capped at the freshly
-quoted ask price, but there is no displayed-quote step — prefer the
-two-phase /orders/proposal → /orders/confirm flow when you want to show
+quoted ask price, but there is no displayed-quote step â€” prefer the
+two-phase /orders/proposal â†’ /orders/confirm flow when you want to show
 the user the payout before committing.
 
  * @summary Place a single-shot trade (proposal + immediate buy)
@@ -584,6 +1055,73 @@ export const usePlaceTrade = <TError = ErrorType<Error | UnauthorizedResponse>,
       > => {
 
       const mutationOptions = getPlaceTradeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Closes a position early at Deriv's current bid. `price` is an optional
+minimum acceptable proceeds â€” omit it to accept whatever Deriv quotes.
+
+ * @summary Sell an open contract before expiry
+ */
+export const sellPosition = (
+    sellRequest: BodyType<SellRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<SellResponse>(
+      {url: `/api/v1/orders/sell`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: sellRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getSellPositionMutationOptions = <TError = ErrorType<Error | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellPosition>>, TError,{data: BodyType<SellRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof sellPosition>>, TError,{data: BodyType<SellRequest>}, TContext> => {
+
+const mutationKey = ['sellPosition'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sellPosition>>, {data: BodyType<SellRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  sellPosition(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SellPositionMutationResult = NonNullable<Awaited<ReturnType<typeof sellPosition>>>
+    export type SellPositionMutationBody = BodyType<SellRequest>
+    export type SellPositionMutationError = ErrorType<Error | UnauthorizedResponse>
+
+    /**
+ * @summary Sell an open contract before expiry
+ */
+export const useSellPosition = <TError = ErrorType<Error | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sellPosition>>, TError,{data: BodyType<SellRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof sellPosition>>,
+        TError,
+        {data: BodyType<SellRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getSellPositionMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -676,60 +1214,6 @@ export function useGetTradeHistory<TData = Awaited<ReturnType<typeof getTradeHis
   return query;
 }
 
-export type SellRequestType = {
-  contract_id: string;
-  price?: string;
-};
 
-export type SellResponse = {
-  contract_id: string;
-  sold_for: string;
-  balance_after: string;
-  transaction_id: number;
-};
 
-export const sellPosition = (
-  sellRequest: BodyType<SellRequestType>,
-  options?: SecondParameter<typeof customInstance>,
-) => {
-  return customInstance<SellResponse>(
-    {
-      url: `/api/v1/orders/sell`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: sellRequest,
-    },
-    options,
-  );
-};
 
-export const useSellPosition = <
-  TError = ErrorType<Error | UnauthorizedResponse>,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof sellPosition>>,
-      TError,
-      { data: BodyType<SellRequestType> },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-) => {
-  const mutationKey = ['sellPosition'];
-  const mutationOptions = options?.mutation
-    ? { ...options.mutation, mutationKey }
-    : { mutationKey };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof sellPosition>>,
-    { data: BodyType<SellRequestType> }
-  > = (props) => {
-    const { data } = props ?? {};
-    return sellPosition(data, options?.request);
-  };
-
-  return useMutation({ mutationFn, ...mutationOptions }, queryClient);
-};

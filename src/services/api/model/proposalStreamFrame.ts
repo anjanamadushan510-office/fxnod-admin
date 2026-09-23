@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -34,7 +34,7 @@ import type { ProposalResponse } from './proposalResponse';
 import type { ProposalStreamFrameAllOf } from './proposalStreamFrameAllOf';
 
 /**
- * A frame from the live proposal WebSocket (`wss://…/ws/proposal`).
+ * A frame from the live proposal WebSocket (`wss://â€¦/ws/proposal`).
 
 OpenAPI 3.0 cannot describe a WebSocket as a path, but the frame still has a wire shape that the frontend must agree with, so it is declared here as a schema. Without it the shape lives only in hand-written TypeScript, which is exactly how `payout_choices` came to be patched into a GENERATED file and silently reverted by the next codegen run.
 

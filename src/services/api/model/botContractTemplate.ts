@@ -25,7 +25,7 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
@@ -39,7 +39,13 @@ import type { BotContractTemplateDurationUnit } from './botContractTemplateDurat
 export interface BotContractTemplate {
   /** FXNod frontend contract type. */
   contract_type: string;
-  symbol: string;
+  /**
+   * Deriv symbols to trade. Each is a live market-data subscription, so a run may name at most 10, with no repeats.
+
+   * @minItems 1
+   * @maxItems 10
+   */
+  symbols: string[];
   currency?: string;
   duration?: number;
   duration_unit?: BotContractTemplateDurationUnit;
@@ -56,4 +62,23 @@ export interface BotContractTemplate {
   growth_rate?: number;
   multiplier?: number;
   payout_per_point?: number;
+  /** The low barrier of an Ends In / Ends Out contract; `barrier` is the high one. Relative offsets like "+0.5" / "-0.5", as with barrier.
+ */
+  barrier2?: string;
+  /**
+   * High / Low Tick only - which tick is predicted to be the highest or lowest.
+   * @minimum 1
+   * @maximum 5
+   */
+  selected_tick?: number;
+  /**
+   * Turbos and vanillas only, and required for them in a bot. Deriv accepts only barriers from a list it computes per market and duration, and the list moves with price, so a bot cannot store a barrier. This picks the entry at that position in Deriv's list when each order is placed: turbos distances run nearest (1) to farthest (10); vanillas strikes run highest (1) to lowest (5). Past the end of a shorter list, the last entry is used.
+
+   * @minimum 1
+   * @maximum 10
+   */
+  barrier_level?: number;
+  /** Higher / Lower, Touch / No Touch and Ends In / Ends Out. The barrier as a multiple of the default distance Deriv publishes for the market and expiry (contracts_for), resolved when each order is placed - raw price points mean nothing across markets. Magnitude 0.1 to 10. Higher / Lower take the sign from the side (Higher above spot, Lower below); Touch uses it (+ above, - below); Ends In / Out spans both sides. Replaces barrier / barrier2.
+ */
+  barrier_scale?: number;
 }

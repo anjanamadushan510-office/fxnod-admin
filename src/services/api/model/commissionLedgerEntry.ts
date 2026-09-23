@@ -25,11 +25,12 @@ They are not intended to be called from the browser; exclude the `Internal`
 tag when generating the public frontend client.
 
 Monetary / percentage values are represented as JSON **strings**
-(`format: decimal`) to preserve precision — parse them with a decimal
+(`format: decimal`) to preserve precision â€” parse them with a decimal
 library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
+import type { CommissionSourceType } from './commissionSourceType';
 import type { DecimalString } from './decimalString';
 import type { CommissionStatus } from './commissionStatus';
 
@@ -37,6 +38,19 @@ export interface CommissionLedgerEntry {
   id: string;
   user_id: string;
   source_user_id: string;
+  /**
+   * Who generated it, as a person rather than a UUID. Null when this service has not cached their profile yet.
+   * @nullable
+   */
+  source_display_name?: string | null;
+  /**
+   * Full at level 1, masked below it.
+   * @nullable
+   */
+  source_email?: string | null;
+  source_email_masked?: boolean;
+  source_type: CommissionSourceType;
+  /** The thing that earned it â€” a trade id for trade_markup, a subscription purchase id for dbot_subscription. */
   trade_id: string;
   platform: string;
   level: number;
@@ -47,6 +61,18 @@ export interface CommissionLedgerEntry {
   deriv_settlement_period: string;
   status: CommissionStatus;
   accrued_at: string;
+  /**
+   * When a held commission becomes payable. Null for trade_markup, which waits for Deriv's monthly payout rather than for a clock.
+   * @nullable
+   */
+  payable_at?: string | null;
+  /** Held back from automatic settlement until a person has looked at it. Not an accusation and not a reversal â€” the amount is unchanged and the row is still accrued. */
+  review_required: boolean;
+  /**
+   * Machine-readable, e.g. shared_funding_source.
+   * @nullable
+   */
+  review_reason?: string | null;
   /** @nullable */
   settled_at?: string | null;
 }
