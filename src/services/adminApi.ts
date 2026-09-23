@@ -75,7 +75,7 @@ export const adminApi = {
     return res.data;
   },
   getTickets: async () => {
-    const res = await api.get("/api/v1/admin/tickets");
+    const res = await api.get("/api/v1/admin/tickets/");
     return res.data;
   },
   updateTicketStatus: async (id: string, status: string) => {
