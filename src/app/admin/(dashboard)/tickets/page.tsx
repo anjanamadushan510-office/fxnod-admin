@@ -20,7 +20,7 @@ export default function AdminTicketsPage() {
     subject: string;
   } | null>(null);
   
-  const [newStatus, setNewStatus] = useState("open");
+  const [newStatus, setNewStatus] = useState("OPEN");
 
   const fetchData = async () => {
     try {
@@ -55,7 +55,11 @@ export default function AdminTicketsPage() {
       setStatusModal(null);
       fetchData();
     } catch (err: any) {
-      toast.error("Error: " + (err.response?.data?.detail || err.message));
+      const errDetail = err.response?.data?.detail;
+      const errMsg = Array.isArray(errDetail) 
+        ? errDetail.map((e: any) => `${e.loc?.join('.')} ${e.msg}`).join(', ') 
+        : errDetail || err.message;
+      toast.error("Error: " + errMsg);
     } finally {
       setProcessingId(null);
     }
@@ -68,13 +72,13 @@ export default function AdminTicketsPage() {
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case "open":
+      case "OPEN":
         return <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold uppercase">Open</span>;
-      case "in_progress":
+      case "IN_PROGRESS":
         return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold uppercase">In Progress</span>;
-      case "resolved":
+      case "RESOLVED":
         return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase">Resolved</span>;
-      case "closed":
+      case "CLOSED":
         return <span className="px-2 py-1 bg-zinc-100 text-zinc-700 rounded-full text-xs font-semibold uppercase">Closed</span>;
       default:
         return <span className="px-2 py-1 bg-zinc-100 text-zinc-700 rounded-full text-xs font-semibold uppercase">{status}</span>;
@@ -115,10 +119,10 @@ export default function AdminTicketsPage() {
                   onChange={(e) => setNewStatus(e.target.value)}
                   className="w-full rounded-xl border border-gold/20 px-4 py-3 text-navy bg-slate-50 focus:border-gold outline-none"
                 >
-                  <option value="open">Open</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="closed">Closed</option>
+                  <option value="OPEN">Open</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="RESOLVED">Resolved</option>
+                  <option value="CLOSED">Closed</option>
                 </select>
               </div>
             </div>
