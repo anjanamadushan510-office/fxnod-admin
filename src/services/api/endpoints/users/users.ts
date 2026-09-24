@@ -50,14 +50,20 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ClientRecordCreate,
+  ClientRecordPublic,
+  CloseAccount200,
   EmailUpdateConfirmRequest,
   EmailUpdateRequest,
   Error,
   KYCStatusResponse,
   KYCSubmission,
+  PasswordUpdateRequest,
   PasswordVerifyRequest,
   RequestEmailUpdate200,
   UnauthorizedResponse,
+  UpdatePassword200,
+  UpdatePassword400,
   UserPublic,
   UserUpdate,
   ValidationErrorResponse,
@@ -225,6 +231,67 @@ export const useUpdateMe = <TError = ErrorType<UnauthorizedResponse | Validation
       > => {
 
       const mutationOptions = getUpdateMeMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Close Account
+ */
+export const closeAccount = (
+    
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<CloseAccount200>(
+      {url: `/api/v1/users/me`, method: 'DELETE'
+    },
+      options);
+    }
+  
+
+
+export const getCloseAccountMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,void, TContext> => {
+
+const mutationKey = ['closeAccount'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof closeAccount>>, void> = () => {
+          
+
+          return  closeAccount(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CloseAccountMutationResult = NonNullable<Awaited<ReturnType<typeof closeAccount>>>
+    
+    export type CloseAccountMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Close Account
+ */
+export const useCloseAccount = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof closeAccount>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getCloseAccountMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -580,3 +647,223 @@ export function useGetKycStatus<TData = Awaited<ReturnType<typeof getKycStatus>>
 
 
 
+/**
+ * @summary Get Client Record
+ */
+export const getClientRecord = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ClientRecordPublic>(
+      {url: `/api/v1/users/me/client-record`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetClientRecordQueryKey = () => {
+    return [
+    `/api/v1/users/me/client-record`
+    ] as const;
+    }
+
+    
+export const getGetClientRecordQueryOptions = <TData = Awaited<ReturnType<typeof getClientRecord>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClientRecord>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetClientRecordQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClientRecord>>> = ({ signal }) => getClientRecord(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClientRecord>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetClientRecordQueryResult = NonNullable<Awaited<ReturnType<typeof getClientRecord>>>
+export type GetClientRecordQueryError = ErrorType<unknown>
+
+
+export function useGetClientRecord<TData = Awaited<ReturnType<typeof getClientRecord>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClientRecord>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientRecord>>,
+          TError,
+          Awaited<ReturnType<typeof getClientRecord>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClientRecord<TData = Awaited<ReturnType<typeof getClientRecord>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClientRecord>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientRecord>>,
+          TError,
+          Awaited<ReturnType<typeof getClientRecord>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClientRecord<TData = Awaited<ReturnType<typeof getClientRecord>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClientRecord>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get Client Record
+ */
+
+export function useGetClientRecord<TData = Awaited<ReturnType<typeof getClientRecord>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClientRecord>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetClientRecordQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+
+/**
+ * @summary Create Client Record
+ */
+export const createClientRecord = (
+    clientRecordCreate: BodyType<ClientRecordCreate>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ClientRecordPublic>(
+      {url: `/api/v1/users/me/client-record`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: clientRecordCreate, signal
+    },
+      options);
+    }
+  
+
+
+export const getCreateClientRecordMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createClientRecord>>, TError,{data: BodyType<ClientRecordCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof createClientRecord>>, TError,{data: BodyType<ClientRecordCreate>}, TContext> => {
+
+const mutationKey = ['createClientRecord'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createClientRecord>>, {data: BodyType<ClientRecordCreate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createClientRecord(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateClientRecordMutationResult = NonNullable<Awaited<ReturnType<typeof createClientRecord>>>
+    export type CreateClientRecordMutationBody = BodyType<ClientRecordCreate>
+    export type CreateClientRecordMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create Client Record
+ */
+export const useCreateClientRecord = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createClientRecord>>, TError,{data: BodyType<ClientRecordCreate>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createClientRecord>>,
+        TError,
+        {data: BodyType<ClientRecordCreate>},
+        TContext
+      > => {
+
+      const mutationOptions = getCreateClientRecordMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * @summary Update password
+ */
+export const updatePassword = (
+    passwordUpdateRequest: BodyType<PasswordUpdateRequest>,
+ options?: SecondParameter<typeof customInstance>,) => {
+      
+      
+      return customInstance<UpdatePassword200>(
+      {url: `/api/v1/users/me/password`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: passwordUpdateRequest
+    },
+      options);
+    }
+  
+
+
+export const getUpdatePasswordMutationOptions = <TError = ErrorType<UpdatePassword400>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePassword>>, TError,{data: BodyType<PasswordUpdateRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePassword>>, TError,{data: BodyType<PasswordUpdateRequest>}, TContext> => {
+
+const mutationKey = ['updatePassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePassword>>, {data: BodyType<PasswordUpdateRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updatePassword(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof updatePassword>>>
+    export type UpdatePasswordMutationBody = BodyType<PasswordUpdateRequest>
+    export type UpdatePasswordMutationError = ErrorType<UpdatePassword400>
+
+    /**
+ * @summary Update password
+ */
+export const useUpdatePassword = <TError = ErrorType<UpdatePassword400>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePassword>>, TError,{data: BodyType<PasswordUpdateRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updatePassword>>,
+        TError,
+        {data: BodyType<PasswordUpdateRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getUpdatePasswordMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    

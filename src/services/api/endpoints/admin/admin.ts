@@ -49,6 +49,10 @@ import type {
   UseQueryResult
 } from '@tanstack/react-query';
 
+import type {
+  ClosedAccountPublic
+} from '../../model';
+
 import { customInstance } from '../../mutator/custom-instance';
 import type { ErrorType } from '../../mutator/custom-instance';
 
@@ -486,4 +490,95 @@ export const usePatchApiV1AdminBlogsIdVisibility = <TError = ErrorType<unknown>,
 
       return useMutation(mutationOptions, queryClient);
     }
+    /**
+ * @summary Get closed accounts
+ */
+export const getClosedAccounts = (
     
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ClosedAccountPublic[]>(
+      {url: `/api/v1/auth/admin/users/closed`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getGetClosedAccountsQueryKey = () => {
+    return [
+    `/api/v1/auth/admin/users/closed`
+    ] as const;
+    }
+
+    
+export const getGetClosedAccountsQueryOptions = <TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetClosedAccountsQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClosedAccounts>>> = ({ signal }) => getClosedAccounts(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetClosedAccountsQueryResult = NonNullable<Awaited<ReturnType<typeof getClosedAccounts>>>
+export type GetClosedAccountsQueryError = ErrorType<unknown>
+
+
+export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClosedAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof getClosedAccounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClosedAccounts>>,
+          TError,
+          Awaited<ReturnType<typeof getClosedAccounts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get closed accounts
+ */
+
+export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetClosedAccountsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
+
+
+

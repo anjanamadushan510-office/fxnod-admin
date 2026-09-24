@@ -30,6 +30,10 @@ export function LoginForm() {
   const loginMut = useLogin({
     mutation: {
       onSuccess: async (data) => {
+        if ("requires_2fa" in data) {
+          toast.info("2FA is required but not yet supported in this admin portal.");
+          return;
+        }
         setAccessToken(data.access_token);
         await bootstrap(); // GET /users/me → store user + status: authenticated
         toast.success("Welcome back");

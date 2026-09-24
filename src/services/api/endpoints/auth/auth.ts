@@ -45,6 +45,7 @@ import type {
   DerivLoginRequest,
   Error,
   LoginRequest,
+  LoginRequires2FAResponse,
   MessageResponse,
   OAuthLoginRequest,
   RefreshRequest,
@@ -52,6 +53,9 @@ import type {
   RegisterResponse,
   ResendOTPRequest,
   TokenPair,
+  TwoFALoginVerifyRequest,
+  TwoFASetupResponse,
+  TwoFAVerifySetupRequest,
   ValidationErrorResponse,
   VerifyEmailRequest,
   VerifyOTPRequest
@@ -142,7 +146,7 @@ export const login = (
 ) => {
       
       
-      return customInstance<TokenPair>(
+      return customInstance<TokenPair | LoginRequires2FAResponse>(
       {url: `/api/v1/auth/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: loginRequest, signal
@@ -666,6 +670,262 @@ export const useLoginWithDeriv = <TError = ErrorType<Error | ValidationErrorResp
       > => {
 
       const mutationOptions = getLoginWithDerivMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Sends a 6-digit OTP to the authenticated user's email address to begin Email 2FA enrollment.
+ * @summary Start Email 2FA setup
+ */
+export const setupEmail2FA = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TwoFASetupResponse>(
+      {url: `/api/v1/auth/2fa/setup`, method: 'POST', signal
+    },
+      options);
+    }
+  
+
+
+export const getSetupEmail2FAMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setupEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof setupEmail2FA>>, TError,void, TContext> => {
+
+const mutationKey = ['setupEmail2FA'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setupEmail2FA>>, void> = () => {
+          
+
+          return  setupEmail2FA(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetupEmail2FAMutationResult = NonNullable<Awaited<ReturnType<typeof setupEmail2FA>>>
+    
+    export type SetupEmail2FAMutationError = ErrorType<void>
+
+    /**
+ * @summary Start Email 2FA setup
+ */
+export const useSetupEmail2FA = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setupEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setupEmail2FA>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getSetupEmail2FAMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Validates the OTP sent during setup and enables Email 2FA on the account.
+ * @summary Verify Email 2FA setup OTP
+ */
+export const verifyEmail2FASetup = (
+    twoFAVerifySetupRequest: BodyType<TwoFAVerifySetupRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<MessageResponse>(
+      {url: `/api/v1/auth/2fa/verify-setup`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: twoFAVerifySetupRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getVerifyEmail2FASetupMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyEmail2FASetup>>, TError,{data: BodyType<TwoFAVerifySetupRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyEmail2FASetup>>, TError,{data: BodyType<TwoFAVerifySetupRequest>}, TContext> => {
+
+const mutationKey = ['verifyEmail2FASetup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyEmail2FASetup>>, {data: BodyType<TwoFAVerifySetupRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  verifyEmail2FASetup(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyEmail2FASetupMutationResult = NonNullable<Awaited<ReturnType<typeof verifyEmail2FASetup>>>
+    export type VerifyEmail2FASetupMutationBody = BodyType<TwoFAVerifySetupRequest>
+    export type VerifyEmail2FASetupMutationError = ErrorType<void>
+
+    /**
+ * @summary Verify Email 2FA setup OTP
+ */
+export const useVerifyEmail2FASetup = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyEmail2FASetup>>, TError,{data: BodyType<TwoFAVerifySetupRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyEmail2FASetup>>,
+        TError,
+        {data: BodyType<TwoFAVerifySetupRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getVerifyEmail2FASetupMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Turns off Email 2FA for the authenticated account.
+ * @summary Disable Email 2FA
+ */
+export const disableEmail2FA = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<MessageResponse>(
+      {url: `/api/v1/auth/2fa/disable`, method: 'POST', signal
+    },
+      options);
+    }
+  
+
+
+export const getDisableEmail2FAMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,void, TContext> => {
+
+const mutationKey = ['disableEmail2FA'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disableEmail2FA>>, void> = () => {
+          
+
+          return  disableEmail2FA(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisableEmail2FAMutationResult = NonNullable<Awaited<ReturnType<typeof disableEmail2FA>>>
+    
+    export type DisableEmail2FAMutationError = ErrorType<void>
+
+    /**
+ * @summary Disable Email 2FA
+ */
+export const useDisableEmail2FA = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof disableEmail2FA>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getDisableEmail2FAMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Step 2 of the Email-2FA login: validates the pending_token and OTP to issue a full token pair.
+ * @summary Complete Email 2FA login
+ */
+export const verifyTwoFALogin = (
+    twoFALoginVerifyRequest: BodyType<TwoFALoginVerifyRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<TokenPair>(
+      {url: `/api/v1/auth/login/verify-2fa`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: twoFALoginVerifyRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getVerifyTwoFALoginMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyTwoFALogin>>, TError,{data: BodyType<TwoFALoginVerifyRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyTwoFALogin>>, TError,{data: BodyType<TwoFALoginVerifyRequest>}, TContext> => {
+
+const mutationKey = ['verifyTwoFALogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyTwoFALogin>>, {data: BodyType<TwoFALoginVerifyRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  verifyTwoFALogin(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyTwoFALoginMutationResult = NonNullable<Awaited<ReturnType<typeof verifyTwoFALogin>>>
+    export type VerifyTwoFALoginMutationBody = BodyType<TwoFALoginVerifyRequest>
+    export type VerifyTwoFALoginMutationError = ErrorType<void>
+
+    /**
+ * @summary Complete Email 2FA login
+ */
+export const useVerifyTwoFALogin = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyTwoFALogin>>, TError,{data: BodyType<TwoFALoginVerifyRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyTwoFALogin>>,
+        TError,
+        {data: BodyType<TwoFALoginVerifyRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getVerifyTwoFALoginMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

@@ -72,7 +72,7 @@ export const createTicket = (
       
       
       return customInstance<TicketPublic>(
-      {url: `/api/v1/tickets`, method: 'POST',
+      {url: `/api/v1/tickets/`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: ticketCreate, signal
     },
@@ -136,7 +136,7 @@ export const listMyTickets = (
       
       
       return customInstance<TicketPublic[]>(
-      {url: `/api/v1/tickets`, method: 'GET', signal
+      {url: `/api/v1/tickets/`, method: 'GET', signal
     },
       options);
     }
@@ -146,7 +146,7 @@ export const listMyTickets = (
 
 export const getListMyTicketsQueryKey = () => {
     return [
-    `/api/v1/tickets`
+    `/api/v1/tickets/`
     ] as const;
     }
 
