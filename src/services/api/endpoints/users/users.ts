@@ -52,12 +52,13 @@ import type {
 import type {
   ClientRecordCreate,
   ClientRecordPublic,
-  CloseAccount200,
+  CloseAccountRequest,
   EmailUpdateConfirmRequest,
   EmailUpdateRequest,
   Error,
   KYCStatusResponse,
   KYCSubmission,
+  MessageResponse,
   PasswordUpdateRequest,
   PasswordVerifyRequest,
   RequestEmailUpdate200,
@@ -231,67 +232,6 @@ export const useUpdateMe = <TError = ErrorType<UnauthorizedResponse | Validation
       > => {
 
       const mutationOptions = getUpdateMeMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    /**
- * @summary Close Account
- */
-export const closeAccount = (
-    
- options?: SecondParameter<typeof customInstance>,) => {
-      
-      
-      return customInstance<CloseAccount200>(
-      {url: `/api/v1/users/me`, method: 'DELETE'
-    },
-      options);
-    }
-  
-
-
-export const getCloseAccountMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,void, TContext> => {
-
-const mutationKey = ['closeAccount'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof closeAccount>>, void> = () => {
-          
-
-          return  closeAccount(requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CloseAccountMutationResult = NonNullable<Awaited<ReturnType<typeof closeAccount>>>
-    
-    export type CloseAccountMutationError = ErrorType<unknown>
-
-    /**
- * @summary Close Account
- */
-export const useCloseAccount = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof closeAccount>>,
-        TError,
-        void,
-        TContext
-      > => {
-
-      const mutationOptions = getCloseAccountMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }
@@ -821,7 +761,7 @@ export const updatePassword = (
   
 
 
-export const getUpdatePasswordMutationOptions = <TError = ErrorType<UpdatePassword400>,
+export const getUpdatePasswordMutationOptions = <TError = ErrorType<UpdatePassword400 | void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePassword>>, TError,{data: BodyType<PasswordUpdateRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updatePassword>>, TError,{data: BodyType<PasswordUpdateRequest>}, TContext> => {
 
@@ -848,12 +788,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdatePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof updatePassword>>>
     export type UpdatePasswordMutationBody = BodyType<PasswordUpdateRequest>
-    export type UpdatePasswordMutationError = ErrorType<UpdatePassword400>
+    export type UpdatePasswordMutationError = ErrorType<UpdatePassword400 | void>
 
     /**
  * @summary Update password
  */
-export const useUpdatePassword = <TError = ErrorType<UpdatePassword400>,
+export const useUpdatePassword = <TError = ErrorType<UpdatePassword400 | void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePassword>>, TError,{data: BodyType<PasswordUpdateRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updatePassword>>,
@@ -863,6 +803,134 @@ export const useUpdatePassword = <TError = ErrorType<UpdatePassword400>,
       > => {
 
       const mutationOptions = getUpdatePasswordMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Emails the code that confirms closing the account. Refused with 409 while the wallet holds a balance, and 503 when the balance cannot be read (fail closed).
+ * @summary Request account closure
+ */
+export const requestAccountClosure = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<MessageResponse>(
+      {url: `/api/v1/users/me/close/request`, method: 'POST', signal
+    },
+      options);
+    }
+  
+
+
+export const getRequestAccountClosureMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAccountClosure>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestAccountClosure>>, TError,void, TContext> => {
+
+const mutationKey = ['requestAccountClosure'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestAccountClosure>>, void> = () => {
+          
+
+          return  requestAccountClosure(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestAccountClosureMutationResult = NonNullable<Awaited<ReturnType<typeof requestAccountClosure>>>
+    
+    export type RequestAccountClosureMutationError = ErrorType<void>
+
+    /**
+ * @summary Request account closure
+ */
+export const useRequestAccountClosure = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestAccountClosure>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestAccountClosure>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getRequestAccountClosureMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Confirms closure with the emailed code. The account's identity, client record, KYC documents, linked logins and support tickets are copied to the retention archive, then the account is deleted and its email is free to register again.
+ * @summary Close account
+ */
+export const closeAccount = (
+    closeAccountRequest: BodyType<CloseAccountRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<MessageResponse>(
+      {url: `/api/v1/users/me/close`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: closeAccountRequest, signal
+    },
+      options);
+    }
+  
+
+
+export const getCloseAccountMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,{data: BodyType<CloseAccountRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,{data: BodyType<CloseAccountRequest>}, TContext> => {
+
+const mutationKey = ['closeAccount'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof closeAccount>>, {data: BodyType<CloseAccountRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  closeAccount(data,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CloseAccountMutationResult = NonNullable<Awaited<ReturnType<typeof closeAccount>>>
+    export type CloseAccountMutationBody = BodyType<CloseAccountRequest>
+    export type CloseAccountMutationError = ErrorType<void>
+
+    /**
+ * @summary Close account
+ */
+export const useCloseAccount = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeAccount>>, TError,{data: BodyType<CloseAccountRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof closeAccount>>,
+        TError,
+        {data: BodyType<CloseAccountRequest>},
+        TContext
+      > => {
+
+      const mutationOptions = getCloseAccountMutationOptions(options);
 
       return useMutation(mutationOptions, queryClient);
     }

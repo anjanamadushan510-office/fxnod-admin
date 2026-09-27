@@ -31,11 +31,14 @@ library, not a float.
  * OpenAPI spec version: 0.1.0
  */
 
-export interface EmailUpdateRequest {
-  new_email: string;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  current_password: string;
-}
+export type GetClosedAccountsParams = {
+/**
+ * @minimum 1
+ * @maximum 200
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
