@@ -12,7 +12,9 @@ name: ci
 
 on:
   push:
-    branches: [main]
+    # Both: staging is where changes are tried, main is what ships. Listing
+    # only one leaves the other building nothing.
+    branches: [main, staging]
     tags: ["v*"]
   pull_request:
 
