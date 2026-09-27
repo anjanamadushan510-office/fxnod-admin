@@ -9,7 +9,10 @@ export default function ClosedAccountsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white">Closed Accounts</h1>
-        <p className="text-zinc-400 mt-2">View users who have archived and closed their accounts.</p>
+        <p className="text-zinc-400 mt-2">
+          Accounts closed by their owners. Identity, KYC, address and support records are kept in the
+          retention archive until the date shown, and cannot be edited or deleted before it.
+        </p>
       </div>
 
       <div className="rounded-xl border border-line bg-panel overflow-hidden">
@@ -27,6 +30,8 @@ export default function ClosedAccountsPage() {
                   <th className="px-6 py-4 font-medium">Original User ID</th>
                   <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Closed At</th>
+                  <th className="px-6 py-4 font-medium">Closed By</th>
+                  <th className="px-6 py-4 font-medium">Retained Until</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -36,6 +41,10 @@ export default function ClosedAccountsPage() {
                     <td className="px-6 py-4 text-zinc-300">{account.email}</td>
                     <td className="px-6 py-4 text-zinc-400 whitespace-nowrap">
                       {new Date(account.closed_at).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-zinc-400 capitalize">{account.closed_by}</td>
+                    <td className="px-6 py-4 text-zinc-400 whitespace-nowrap">
+                      {new Date(account.retain_until).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}

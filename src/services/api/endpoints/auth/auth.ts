@@ -53,6 +53,7 @@ import type {
   RegisterResponse,
   ResendOTPRequest,
   TokenPair,
+  TwoFADisableRequest,
   TwoFALoginVerifyRequest,
   TwoFASetupResponse,
   TwoFAVerifySetupRequest,
@@ -802,17 +803,82 @@ export const useVerifyEmail2FASetup = <TError = ErrorType<void>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
- * Turns off Email 2FA for the authenticated account.
- * @summary Disable Email 2FA
+ * Emails the code that confirms turning Email 2FA off. The session alone is never enough to remove a second factor.
+ * @summary Request Email 2FA removal
  */
-export const disableEmail2FA = (
+export const requestDisableEmail2FA = (
     
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<MessageResponse>(
-      {url: `/api/v1/auth/2fa/disable`, method: 'POST', signal
+      {url: `/api/v1/auth/2fa/disable/request`, method: 'POST', signal
+    },
+      options);
+    }
+  
+
+
+export const getRequestDisableEmail2FAMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestDisableEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestDisableEmail2FA>>, TError,void, TContext> => {
+
+const mutationKey = ['requestDisableEmail2FA'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestDisableEmail2FA>>, void> = () => {
+          
+
+          return  requestDisableEmail2FA(requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestDisableEmail2FAMutationResult = NonNullable<Awaited<ReturnType<typeof requestDisableEmail2FA>>>
+    
+    export type RequestDisableEmail2FAMutationError = ErrorType<void>
+
+    /**
+ * @summary Request Email 2FA removal
+ */
+export const useRequestDisableEmail2FA = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestDisableEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestDisableEmail2FA>>,
+        TError,
+        void,
+        TContext
+      > => {
+
+      const mutationOptions = getRequestDisableEmail2FAMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
+ * Turns off Email 2FA, confirmed with the code from /auth/2fa/disable/request.
+ * @summary Disable Email 2FA
+ */
+export const disableEmail2FA = (
+    twoFADisableRequest: BodyType<TwoFADisableRequest>,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<MessageResponse>(
+      {url: `/api/v1/auth/2fa/disable`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: twoFADisableRequest, signal
     },
       options);
     }
@@ -820,8 +886,8 @@ export const disableEmail2FA = (
 
 
 export const getDisableEmail2FAMutationOptions = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,{data: BodyType<TwoFADisableRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,{data: BodyType<TwoFADisableRequest>}, TContext> => {
 
 const mutationKey = ['disableEmail2FA'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -833,10 +899,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disableEmail2FA>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disableEmail2FA>>, {data: BodyType<TwoFADisableRequest>}> = (props) => {
+          const {data} = props ?? {};
 
-          return  disableEmail2FA(requestOptions)
+          return  disableEmail2FA(data,requestOptions)
         }
 
         
@@ -845,18 +911,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type DisableEmail2FAMutationResult = NonNullable<Awaited<ReturnType<typeof disableEmail2FA>>>
-    
+    export type DisableEmail2FAMutationBody = BodyType<TwoFADisableRequest>
     export type DisableEmail2FAMutationError = ErrorType<void>
 
     /**
  * @summary Disable Email 2FA
  */
 export const useDisableEmail2FA = <TError = ErrorType<void>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disableEmail2FA>>, TError,{data: BodyType<TwoFADisableRequest>}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof disableEmail2FA>>,
         TError,
-        void,
+        {data: BodyType<TwoFADisableRequest>},
         TContext
       > => {
 

@@ -31,4 +31,16 @@ library, not a float.
  * OpenAPI spec version: 0.1.0
  */
 
-export type CloseAccount200 = { [key: string]: unknown };
+export interface CloseAccountRequest {
+  /**
+   * @minLength 4
+   * @maxLength 10
+   * @pattern ^\d+$
+   */
+  code: string;
+  /**
+   * @maxLength 1000
+   * @nullable
+   */
+  reason?: string | null;
+}

@@ -31,11 +31,11 @@ library, not a float.
  * OpenAPI spec version: 0.1.0
  */
 
-export interface EmailUpdateRequest {
-  new_email: string;
+export interface TwoFADisableRequest {
   /**
-   * @minLength 1
-   * @maxLength 128
+   * @minLength 4
+   * @maxLength 10
+   * @pattern ^\d+$
    */
-  current_password: string;
+  code: string;
 }

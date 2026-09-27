@@ -36,4 +36,6 @@ export interface ClosedAccountPublic {
   original_user_id: string;
   email: string;
   closed_at: string;
+  closed_by: string;
+  retain_until: string;
 }
