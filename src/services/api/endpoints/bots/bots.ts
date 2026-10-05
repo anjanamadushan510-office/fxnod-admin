@@ -1446,6 +1446,70 @@ export const useStopBotRun = <TError = ErrorType<void>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
+ * Ends the run in whatever state it is in and drops the worker's lease, so it places no further trades. An open contract is sold when Deriv will buy it back; a contract that cannot be sold is left to finish. Idempotent once the run has ended.
+
+ * @summary Emergency stop a bot run
+ */
+export const forceStopBotRun = (
+    id: string,
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<BotRun>(
+      {url: `/api/v1/bots/runs/${id}/force-stop`, method: 'POST', signal
+    },
+      options);
+    }
+  
+
+
+export const getForceStopBotRunMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof forceStopBotRun>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof forceStopBotRun>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['forceStopBotRun'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof forceStopBotRun>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  forceStopBotRun(id,requestOptions)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ForceStopBotRunMutationResult = NonNullable<Awaited<ReturnType<typeof forceStopBotRun>>>
+    
+    export type ForceStopBotRunMutationError = ErrorType<void>
+
+    /**
+ * @summary Emergency stop a bot run
+ */
+export const useForceStopBotRun = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof forceStopBotRun>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof forceStopBotRun>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+
+      const mutationOptions = getForceStopBotRunMutationOptions(options);
+
+      return useMutation(mutationOptions, queryClient);
+    }
+    /**
  * Stops new orders. Open contracts are left to settle â€” closing them early would realise losses the user never asked to realise.
 
  * @summary Pause a bot run

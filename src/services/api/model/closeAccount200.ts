@@ -30,9 +30,5 @@ library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
-import type { Subscription } from './subscription';
 
-/**
- * @nullable
- */
-export type SubscriptionStatusResponseSubscription = Subscription | null;
+export type CloseAccount200 = { [key: string]: unknown };

@@ -30,20 +30,12 @@ library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
-import type { SubscriptionProduct } from './subscriptionProduct';
-import type { SubscriptionState } from './subscriptionState';
 
-export interface Subscription {
-  subscription_id: string;
-  product: SubscriptionProduct;
-  status: SubscriptionState;
-  /** The plan of the most recent purchase; history is not in this field. */
-  current_plan_id: string;
-  started_at: string;
+export interface ResetPasswordRequest {
+  reset_token: string;
   /**
-   * Null only when is_lifetime is true.
-   * @nullable
+   * @minLength 8
+   * @maxLength 128
    */
-  expires_at: string | null;
-  is_lifetime: boolean;
+  new_password: string;
 }

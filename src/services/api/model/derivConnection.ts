@@ -40,5 +40,9 @@ export interface DerivConnection {
   connected_at: string;
   expires_at: string;
   needs_reconnect: boolean;
+  /** Name of the person who owns this Deriv login, as Deriv reports it. Absent when the grant expired before it was stored, or Deriv did not send one. */
+  owner_name?: string;
+  /** Deriv's id for that person, shared by the login's real and demo accounts. This is what tells two connected logins apart. */
+  client_id?: string;
   accounts: DerivLinkedAccount[];
 }

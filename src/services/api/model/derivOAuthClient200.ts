@@ -30,25 +30,7 @@ library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
-import type { SubscriptionProduct } from './subscriptionProduct';
-import type { DecimalString } from './decimalString';
-import type { SubscriptionPlanCompareAtPriceUsd } from './subscriptionPlanCompareAtPriceUsd';
 
-export interface SubscriptionPlan {
-  plan_id: string;
-  product: SubscriptionProduct;
-  name: string;
-  /**
-   * Null means the plan never expires.
-   * @nullable
-   */
-  duration_days: number | null;
-  price_usd: DecimalString;
-  /**
-   * A "was" price to show struck through beside price_usd, always higher than it, or null for none. Display only: the charge is price_usd, and a purchase never reads this.
-   * @nullable
-   */
-  compare_at_price_usd?: SubscriptionPlanCompareAtPriceUsd;
-  /** What the wallet is actually debited in. The field is named `price_usd` because the figure IS dollars â€” USDT is a dollar stablecoin and FXNod treats them 1:1 â€” but the price list and the receipt must say the same word, and they did not. */
-  currency: string;
-}
+export type DerivOAuthClient200 = {
+  client_id: string;
+};

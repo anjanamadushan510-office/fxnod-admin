@@ -50,8 +50,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  ClosedAccountPublic,
-  GetClosedAccountsParams
+  ClosedAccountPublic
 } from '../../model';
 
 import { customInstance } from '../../mutator/custom-instance';
@@ -495,14 +494,13 @@ export const usePatchApiV1AdminBlogsIdVisibility = <TError = ErrorType<unknown>,
  * @summary Get closed accounts
  */
 export const getClosedAccounts = (
-    params?: GetClosedAccountsParams,
+    
  options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
 ) => {
       
       
       return customInstance<ClosedAccountPublic[]>(
-      {url: `/api/v1/auth/admin/users/closed`, method: 'GET',
-        params, signal
+      {url: `/api/v1/auth/admin/users/closed`, method: 'GET', signal
     },
       options);
     }
@@ -510,23 +508,23 @@ export const getClosedAccounts = (
 
 
 
-export const getGetClosedAccountsQueryKey = (params?: GetClosedAccountsParams,) => {
+export const getGetClosedAccountsQueryKey = () => {
     return [
-    `/api/v1/auth/admin/users/closed`, ...(params ? [params]: [])
+    `/api/v1/auth/admin/users/closed`
     ] as const;
     }
 
     
-export const getGetClosedAccountsQueryOptions = <TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(params?: GetClosedAccountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetClosedAccountsQueryOptions = <TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetClosedAccountsQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetClosedAccountsQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClosedAccounts>>> = ({ signal }) => getClosedAccounts(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getClosedAccounts>>> = ({ signal }) => getClosedAccounts(requestOptions, signal);
 
       
 
@@ -540,7 +538,7 @@ export type GetClosedAccountsQueryError = ErrorType<unknown>
 
 
 export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
- params: undefined |  GetClosedAccountsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>> & Pick<
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getClosedAccounts>>,
           TError,
@@ -550,7 +548,7 @@ export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosed
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
- params?: GetClosedAccountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>> & Pick<
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getClosedAccounts>>,
           TError,
@@ -560,7 +558,7 @@ export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosed
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
- params?: GetClosedAccountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -568,11 +566,11 @@ export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosed
  */
 
 export function useGetClosedAccounts<TData = Awaited<ReturnType<typeof getClosedAccounts>>, TError = ErrorType<unknown>>(
- params?: GetClosedAccountsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getClosedAccounts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetClosedAccountsQueryOptions(params,options)
+  const queryOptions = getGetClosedAccountsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

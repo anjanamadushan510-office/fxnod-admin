@@ -866,7 +866,7 @@ export const useRequestDisableEmail2FA = <TError = ErrorType<void>,
       return useMutation(mutationOptions, queryClient);
     }
     /**
- * Turns off Email 2FA, confirmed with the code from /auth/2fa/disable/request.
+ * Turns off Email 2FA for the authenticated account.
  * @summary Disable Email 2FA
  */
 export const disableEmail2FA = (

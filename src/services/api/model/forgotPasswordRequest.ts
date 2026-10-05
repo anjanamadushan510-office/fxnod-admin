@@ -30,10 +30,7 @@ library, not a float.
 
  * OpenAPI spec version: 0.1.0
  */
-import type { DecimalString } from './decimalString';
 
-/**
- * A "was" price to show struck through beside price_usd, always higher than it, or null for none. Display only: the charge is price_usd, and a purchase never reads this.
- * @nullable
- */
-export type SubscriptionPlanCompareAtPriceUsd = DecimalString | null;
+export interface ForgotPasswordRequest {
+  email: string;
+}

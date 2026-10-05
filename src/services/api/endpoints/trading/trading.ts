@@ -63,6 +63,7 @@ import type {
   DerivExchangeResponse,
   DerivLinkRequest,
   DerivLinkResponse,
+  DerivOAuthClient200,
   DerivSelectAccountRequest,
   DerivUnlink200,
   Error,
@@ -80,6 +81,99 @@ import type { ErrorType , BodyType } from '../../mutator/custom-instance';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+/**
+ * The public Deriv OAuth client id for this environment's dTrader app. The browser puts it in the authorize URL. Staging and production return different ids, so the frontend must not bake one in at build time.
+ * @summary OAuth client id for connecting dTrader
+ */
+export const derivOAuthClient = (
+    
+ options?: SecondParameter<typeof customInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DerivOAuthClient200>(
+      {url: `/api/v1/deriv/oauth/client`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDerivOAuthClientQueryKey = () => {
+    return [
+    `/api/v1/deriv/oauth/client`
+    ] as const;
+    }
+
+    
+export const getDerivOAuthClientQueryOptions = <TData = Awaited<ReturnType<typeof derivOAuthClient>>, TError = ErrorType<UnauthorizedResponse | Error>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivOAuthClient>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDerivOAuthClientQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof derivOAuthClient>>> = ({ signal }) => derivOAuthClient(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof derivOAuthClient>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DerivOAuthClientQueryResult = NonNullable<Awaited<ReturnType<typeof derivOAuthClient>>>
+export type DerivOAuthClientQueryError = ErrorType<UnauthorizedResponse | Error>
+
+
+export function useDerivOAuthClient<TData = Awaited<ReturnType<typeof derivOAuthClient>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivOAuthClient>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivOAuthClient>>,
+          TError,
+          Awaited<ReturnType<typeof derivOAuthClient>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivOAuthClient<TData = Awaited<ReturnType<typeof derivOAuthClient>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivOAuthClient>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof derivOAuthClient>>,
+          TError,
+          Awaited<ReturnType<typeof derivOAuthClient>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDerivOAuthClient<TData = Awaited<ReturnType<typeof derivOAuthClient>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivOAuthClient>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary OAuth client id for connecting dTrader
+ */
+
+export function useDerivOAuthClient<TData = Awaited<ReturnType<typeof derivOAuthClient>>, TError = ErrorType<UnauthorizedResponse | Error>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof derivOAuthClient>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDerivOAuthClientQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
+}
+
 
 
 
