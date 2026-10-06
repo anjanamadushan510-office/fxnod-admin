@@ -14,6 +14,7 @@ export default function AdminLoginPage() {
   const { login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [totpCode, setTotpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +24,7 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      await login(email, password);
+      await login(email, password, totpCode);
       toast.success("Admin login successful");
       router.push("/admin/dashboard" as Route);
     } catch (err: any) {
@@ -60,7 +61,14 @@ export default function AdminLoginPage() {
             required
             placeholder="••••••••"
           />
-          
+          <Field
+            label="Authenticator code"
+            value={totpCode}
+            onChange={setTotpCode}
+            autoComplete="one-time-code"
+            placeholder="6-digit code"
+          />
+
           {error && (
             <div className="p-3 bg-red-50 border border-red-100 rounded-md text-red-600 text-sm">
               {error}

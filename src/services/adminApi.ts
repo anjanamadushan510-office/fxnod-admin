@@ -2,7 +2,7 @@ import { api } from "./api";
 import type { UserPublic } from "./authApi";
 
 export const adminApi = {
-  login: async (credentials: { email: string; password: string }) => {
+  login: async (credentials: { email: string; password: string; totp_code?: string }) => {
     // We explicitly call the admin login endpoint
     // It will set the fxnod_admin_refresh httpOnly cookie
     const res = await api.post("/api/v1/auth/admin/login", credentials);

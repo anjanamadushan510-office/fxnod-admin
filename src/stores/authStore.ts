@@ -12,7 +12,7 @@ import { authApi } from "@/services/authApi";
 interface AuthState {
   user: UserPublic | null;
   status: "idle" | "loading" | "authenticated" | "anonymous";
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, totpCode?: string) => Promise<void>;
   logout: () => Promise<void>;
   bootstrap: () => Promise<void>;
 }
@@ -27,9 +27,12 @@ export const useAuthStore = create<AuthState>((set) => {
     user: null,
     status: "idle",
 
-    async login(email, password) {
+    async login(email, password, totpCode) {
       set({ status: "loading" });
-      const { access_token } = await adminApi.login({ email, password });
+      // Authenticator apps show "123 456"; the API wants the digits alone.
+      // Left out entirely when blank, for environments that do not ask.
+      const totp_code = totpCode?.replace(/\s+/g, "") || undefined;
+      const { access_token } = await adminApi.login({ email, password, totp_code });
       setAdminAccessToken(access_token);
       const user = await adminApi.me();
       set({ user, status: "authenticated" });
