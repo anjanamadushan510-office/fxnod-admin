@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Banknote,
   Cpu,
   LayoutDashboard,
   LifeBuoy,
@@ -32,6 +33,7 @@ const NAV: NavItem[] = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/deposits", label: "Deposits", icon: Wallet },
   { href: "/admin/subscriptions", label: "dBot subscriptions", icon: Cpu },
+  { href: "/admin/payouts", label: "Deriv payouts", icon: Banknote },
   { href: "/admin/tickets", label: "Ticket Management", icon: LifeBuoy },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/users/closed", label: "Closed Accounts", icon: UserX },

@@ -167,3 +167,72 @@ export const subscriptionsApi = {
     return res.data;
   },
 };
+
+/**
+ * Deriv payouts — the one screen that pays partners.
+ *
+ * Trade-markup commission is accrued trade by trade and paid when Deriv's
+ * monthly markup payout is recorded here. The operator states what Deriv paid
+ * and nothing else: the server measures it against the markup the trading
+ * engine recorded for the month and pays every commission the same share.
+ * There is deliberately no field for that share.
+ *
+ * Amounts are decimal strings, as the API sends them. Do not parse them into
+ * numbers to do arithmetic; see `lib/decimal.ts`.
+ */
+export type PayoutBatchStatus = "recorded" | "settling" | "settled";
+
+export interface PayoutBatch {
+  id: string;
+  /** YYYY-MM. */
+  period: string;
+  source: string;
+  amount: string;
+  currency: string;
+  status: PayoutBatchStatus;
+  admin_note: string | null;
+  /** What the amount was measured against. Null on a batch from before the
+   *  measure existed, which paid in full. */
+  expected_markup: string | null;
+  /** 0 to 1. Null means paid in full. */
+  settlement_ratio: string | null;
+  recorded_by: string | null;
+  /** Filled in once the month has been settled. */
+  commissions_settled: number | null;
+  commission_accrued: string | null;
+  commission_paid: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayoutPreview {
+  period: string;
+  currency: string;
+  /** False while the month is still running (UTC). */
+  period_ended: boolean;
+  expected_markup: string;
+  trades: number;
+  commission_waiting: string;
+  commission_waiting_rows: number;
+  commission_waiting_recipients: number;
+  commission_already_paid: string;
+  recorded: PayoutBatch | null;
+}
+
+export const payoutsApi = {
+  list: async () => {
+    const res = await api.get<PayoutBatch[]>("/api/v1/admin/payouts");
+    return res.data;
+  },
+  preview: async (period: string) => {
+    const res = await api.get<PayoutPreview>(
+      "/api/v1/admin/payouts/deriv/preview",
+      { params: { period } },
+    );
+    return res.data;
+  },
+  record: async (payload: { period: string; amount: string; admin_note?: string }) => {
+    const res = await api.post<PayoutBatch>("/api/v1/admin/payouts/deriv", payload);
+    return res.data;
+  },
+};
