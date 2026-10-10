@@ -12,9 +12,10 @@ name: ci
 
 on:
   push:
-    # Both: staging is where changes are tried, main is what ships. Listing
-    # only one leaves the other building nothing.
-    branches: [main, staging]
+    # All three deploy branches. Vercel builds each of them, and a branch
+    # left out here is deployed with nothing having checked that it
+    # type-checks or builds: testing was, from the day it was created.
+    branches: [main, staging, testing]
     tags: ["v*"]
   pull_request:
 
