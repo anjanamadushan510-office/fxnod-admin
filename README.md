@@ -144,3 +144,7 @@ All API calls go through NGINX gateway:
 - Store refresh token in **httpOnly cookie**, access token in memory
 - Implement automatic token refresh on 401 responses
 - WebSocket reconnection logic with exponential backoff
+
+## Tool commerce
+
+`/admin/commerce` manages tools, free and paid plans, duration offers, bundles, coupons, purchases and an audit log. It requires the wallet commerce API and migration 0008 from fxnod-backend. Legacy dBot subscriptions remain under `/admin/subscriptions`; new purchases appear in the commerce Orders tab. Prices and access are validated by the backend.

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Banknote,
   Cpu,
+  Boxes,
   LayoutDashboard,
   LifeBuoy,
   Menu,
@@ -32,7 +33,8 @@ const NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/deposits", label: "Deposits", icon: Wallet },
-  { href: "/admin/subscriptions", label: "dBot subscriptions", icon: Cpu },
+  { href: "/admin/commerce", label: "Tools & memberships", icon: Boxes },
+  { href: "/admin/subscriptions", label: "Legacy subscriptions", icon: Cpu },
   { href: "/admin/payouts", label: "Deriv payouts", icon: Banknote },
   { href: "/admin/tickets", label: "Ticket Management", icon: LifeBuoy },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },

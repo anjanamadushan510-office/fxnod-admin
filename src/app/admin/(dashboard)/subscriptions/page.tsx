@@ -90,10 +90,10 @@ export default function AdminSubscriptionsPage() {
           </div>
           <div>
             <h1 className="m-0 text-2xl font-bold tracking-tight text-navy">
-              dBot subscriptions
+              Legacy dBot subscriptions
             </h1>
             <p className="m-0 text-sm text-navy-3">
-              Who can run bots, and what has been paid for it.
+              Historical dBot subscriptions. New memberships and purchases appear in Tools & memberships.
             </p>
           </div>
         </div>
