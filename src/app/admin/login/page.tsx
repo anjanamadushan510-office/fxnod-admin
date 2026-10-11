@@ -4,9 +4,9 @@ import { useState } from "react";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 import { useAuthStore } from "@/stores/authStore";
-import { AuthShell } from "@/components/auth/AuthShell";
 import { Field, SubmitButton } from "@/components/auth/fields";
 
 export default function AdminLoginPage() {
@@ -27,9 +27,15 @@ export default function AdminLoginPage() {
       await login(email, password, totpCode);
       toast.success("Admin login successful");
       router.push("/admin/dashboard" as Route);
-    } catch (err: any) {
-      console.error("Admin login error", err);
-      setError(err?.response?.data?.detail || "Failed to log in");
+    } catch (err: unknown) {
+      const detail = isAxiosError(err) ? err.response?.data?.detail : undefined;
+      setError(
+        typeof detail === "string"
+          ? detail
+          : isAxiosError(err) && !err.response
+            ? "Unable to reach the admin API. Check your connection and try again."
+            : "Unable to sign in. Check your email, password and authenticator code, then try again."
+      );
       toast.error("Admin login failed");
     } finally {
       setIsLoading(false);
@@ -67,6 +73,7 @@ export default function AdminLoginPage() {
             onChange={setTotpCode}
             autoComplete="one-time-code"
             placeholder="6-digit code"
+            required
           />
 
           {error && (
