@@ -14,7 +14,6 @@ export default function AdminLoginPage() {
   const { login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [totpCode, setTotpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +23,7 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      await login(email, password, totpCode);
+      await login(email, password);
       toast.success("Admin login successful");
       router.push("/admin/dashboard" as Route);
     } catch (err: unknown) {
@@ -34,7 +33,7 @@ export default function AdminLoginPage() {
           ? detail
           : isAxiosError(err) && !err.response
             ? "Unable to reach the admin API. Check your connection and try again."
-            : "Unable to sign in. Check your email, password and authenticator code, then try again."
+            : "Unable to sign in. Check your email and password, then try again."
       );
       toast.error("Admin login failed");
     } finally {
@@ -66,14 +65,6 @@ export default function AdminLoginPage() {
             onChange={setPassword}
             required
             placeholder="••••••••"
-          />
-          <Field
-            label="Authenticator code"
-            value={totpCode}
-            onChange={setTotpCode}
-            autoComplete="one-time-code"
-            placeholder="6-digit code"
-            required
           />
 
           {error && (
