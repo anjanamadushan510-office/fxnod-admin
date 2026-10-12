@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Banknote,
+  Activity,
   Cpu,
   Boxes,
   LayoutDashboard,
@@ -32,6 +33,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/activity", label: "User activity", icon: Activity },
   { href: "/admin/deposits", label: "Deposits", icon: Wallet },
   { href: "/admin/commerce", label: "Tools & memberships", icon: Boxes },
   { href: "/admin/subscriptions", label: "Legacy subscriptions", icon: Cpu },

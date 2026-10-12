@@ -1,156 +1,183 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { Search, ChevronLeft, XCircle, Filter } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { toast } from "sonner";
-
-import { adminApi } from "@/services/adminApi";
-import type { UserPublic } from "@/services/authApi";
-
+import { userControls } from "@/services/userControls";
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<UserPublic[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
+  const [search, setSearch] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [state, setState] = useState("all");
+  const [offset, setOffset] = useState(0);
   useEffect(() => {
-    loadUsers();
-  }, []);
-
-  async function loadUsers() {
-    try {
-      const data = await adminApi.getUsers();
-      setUsers(data);
-    } catch (err) {
-      console.error("Failed to load users", err);
-      setError("Failed to load users. Please ensure you have admin privileges.");
-      toast.error("Error loading users");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  const filteredUsers = users.filter(
-    (u) =>
-      u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (u.full_name && u.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  const formatDate = (isoString: string) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(isoString));
-  };
-
+    const timer = setTimeout(() => {
+      setDebounced(search);
+      setOffset(0);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const overview = useQuery({
+    queryKey: ["user-overview"],
+    queryFn: userControls.overview,
+    refetchInterval: 30000,
+  });
+  const query = useQuery({
+    queryKey: ["user-directory", debounced, state, offset],
+    queryFn: () => userControls.directory({ search: debounced, state, offset }),
+  });
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 relative">
-      
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/30 relative overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-gold/5 to-gold-2/5 rounded-full blur-3xl -z-10"></div>
-        
+    <div className="space-y-6">
+      <div className="flex flex-wrap justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">User Management</h1>
-          <p className="text-slate-500">Manage dBot access and review uploaded payment receipts.</p>
+          <h1 className="text-3xl font-bold">Users & account access</h1>
+          <p className="text-slate-500 mt-2">
+            Inspect activity, balances, trades and access restrictions.
+          </p>
         </div>
-        
-        <div className="flex items-center gap-4 w-full sm:w-auto">
-          <div className="relative w-full sm:w-80">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-400" />
-            </div>
-            <input
-              type="text"
-              className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-2xl bg-slate-50/50 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold focus:bg-white transition-all shadow-inner"
-              placeholder="Search by email or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <Link
+          href={"/admin/activity" as any}
+          className="rounded-xl border px-4 py-3 bg-white text-sm h-fit"
+        >
+          View all activity →
+        </Link>
+      </div>
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[
+          ["Total users", overview.data?.users],
+          ["Restricted users", overview.data?.restricted],
+          ["Inactive accounts", overview.data?.inactive],
+        ].map(([label, value]) => (
+          <div className="p-5 rounded-2xl border bg-white" key={label}>
+            <p className="text-sm text-slate-500">{label}</p>
+            <p className="text-3xl font-semibold mt-2">{value ?? "—"}</p>
           </div>
-          <button className="h-11 w-11 flex items-center justify-center bg-white border border-gray-200 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-gold transition-colors shadow-sm">
-            <Filter className="w-5 h-5" />
+        ))}
+      </div>
+      <section className="rounded-2xl border bg-white overflow-hidden">
+        <div className="p-5 flex flex-wrap gap-3 border-b">
+          <input
+            aria-label="Search users"
+            placeholder="Search email or name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border rounded-xl p-3 flex-1 min-w-48"
+          />
+          <select
+            aria-label="Account status"
+            value={state}
+            onChange={(e) => {
+              setState(e.target.value);
+              setOffset(0);
+            }}
+            className="border rounded-xl p-3"
+          >
+            <option value="all">All accounts</option>
+            <option value="active">Unrestricted</option>
+            <option value="restricted">Restricted</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <button
+            onClick={() => query.refetch()}
+            disabled={query.isFetching}
+            className="px-3 text-sm disabled:opacity-40"
+          >
+            Refresh
           </button>
         </div>
-      </div>
-
-      {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-medium border border-red-100 shadow-sm flex items-center gap-3">
-          <XCircle className="w-5 h-5 text-red-500" />
-          {error}
-        </div>
-      )}
-
-      {/* Table Section */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/30 border border-gray-100 overflow-hidden">
+        {query.isError && (
+          <p role="alert" className="p-5 text-red-700">
+            Could not load users. Refresh to retry.
+          </p>
+        )}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-slate-50/80 text-slate-500 font-bold border-b border-gray-100">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-slate-50 text-slate-500">
               <tr>
-                <th className="px-8 py-5 tracking-wider">USER</th>
-                <th className="px-8 py-5 tracking-wider">JOINED</th>
-                <th className="px-8 py-5 tracking-wider text-right">ACCESS</th>
+                {["User", "Verification", "Access", "Joined", ""].map(
+                  (h, i) => (
+                    <th key={i} className="p-5 font-medium">
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100/80">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={3} className="px-8 py-20 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center space-y-4">
-                      <div className="w-8 h-8 border-4 border-gold border-t-transparent rounded-full animate-spin"></div>
-                      <p className="font-medium">Loading user database...</p>
+            <tbody className="divide-y">
+              {query.data?.items.map((u) => (
+                <tr key={u.id} className="hover:bg-slate-50">
+                  <td className="p-5">
+                    <div className="font-semibold">
+                      {u.full_name || "Unnamed user"}{" "}
+                      {u.role === "admin" && (
+                        <span className="text-xs text-amber-700">Admin</span>
+                      )}
+                    </div>
+                    <div className="text-slate-500">{u.email}</div>
+                  </td>
+                  <td className="p-5">
+                    {u.kyc_status.replaceAll("_", " ")}
+                    <div className="text-xs text-slate-500">
+                      Email {u.is_email_verified ? "verified" : "unverified"}
                     </div>
                   </td>
-                </tr>
-              ) : filteredUsers.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="px-8 py-20 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
-                        <Search className="w-8 h-8 text-slate-300" />
-                      </div>
-                      <p className="text-lg font-medium text-slate-700">No users found</p>
-                      <p className="text-sm mt-1">{searchQuery ? `No matches for "${searchQuery}"` : "The database is empty."}</p>
-                    </div>
+                  <td className="p-5">
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${!u.is_active || u.blocked_scopes.length ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}
+                    >
+                      {!u.is_active
+                        ? "Account inactive"
+                        : u.blocked_scopes.length
+                          ? u.blocked_scopes.join(", ")
+                          : "Unrestricted"}
+                    </span>
+                  </td>
+                  <td className="p-5 whitespace-nowrap">
+                    {new Date(u.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="p-5">
+                    <Link
+                      href={`/admin/users/${u.id}` as any}
+                      className="font-semibold text-amber-700"
+                    >
+                      Inspect →
+                    </Link>
                   </td>
                 </tr>
-              ) : (
-                filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-8 py-5">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold/10 to-gold-2/10 text-gold-3 flex items-center justify-center font-bold mr-4 border border-gold/20 shadow-sm group-hover:scale-110 transition-transform">
-                          {user.email.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-800">{user.full_name || "Unknown"}</div>
-                          <div className="text-slate-500 text-xs font-medium mt-0.5">{user.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-5 text-slate-500 font-medium">
-                      {formatDate(user.created_at)}
-                    </td>
-                    <td className="px-8 py-5 text-right">
-                      {/* dBot access is decided by the subscription, and is shown
-                          on the subscriptions screen. */}
-                      <Link
-                        href={"/admin/subscriptions" as any}
-                        className="text-xs font-semibold text-slate-400 hover:text-gold"
-                      >
-                        Subscriptions →
-                      </Link>
-                    </td>
-                  </tr>
-                ))
+              ))}
+              {!query.data?.items.length && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-slate-500">
+                    {query.isLoading
+                      ? "Loading accounts…"
+                      : "No matching accounts."}
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
-
+        <div className="p-5 border-t flex justify-between text-sm">
+          <span>
+            {query.data?.total ?? 0} accounts · Page{" "}
+            {Math.floor(offset / 25) + 1}
+          </span>
+          <div className="flex gap-4">
+            <button
+              disabled={!offset}
+              onClick={() => setOffset(offset - 25)}
+              className="disabled:opacity-30"
+            >
+              Previous
+            </button>
+            <button
+              disabled={offset + 25 >= (query.data?.total ?? 0)}
+              onClick={() => setOffset(offset + 25)}
+              className="disabled:opacity-30"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
