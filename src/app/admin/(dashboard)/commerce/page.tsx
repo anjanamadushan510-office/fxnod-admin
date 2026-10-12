@@ -276,7 +276,7 @@ export default function CommercePage() {
                   {tab === "tiers" && (
                     <>
                       <Badge>
-                        {row.is_free ? "Free" : "Paid"} ·{" "}
+                        Plan checkout required ·{" "}
                         {row.is_active ? "Active" : "Retired"}
                       </Badge>
                       <p className="mt-3 text-xs text-slate-600">
@@ -290,7 +290,7 @@ export default function CommercePage() {
                         <strong className="text-lg text-slate-900">
                           {amount(row.price)}
                         </strong>
-                        {!!row.compare_at && (
+                        {Number(row.compare_at) > Number(row.price) && (
                           <span className="text-xs text-slate-500 line-through">
                             {amount(row.compare_at)}
                           </span>

@@ -279,7 +279,7 @@ export function CommerceEditor({
               "Plan level",
               "number",
               true,
-              "Higher levels are upgrades; use 0 for Free and 10 for Pro.",
+              "Higher levels are upgrades; for example, 0 for Basic and 10 for Pro.",
             )}
             {textArea(
               "features",
@@ -295,7 +295,10 @@ export function CommerceEditor({
               Built-in capabilities: bot_demo, bot_real, manual_trade. A new
               capability must also be enforced by its tool service.
             </p>
-            {check("is_free", "Free access for all signed-in users")}
+            <p className="text-xs text-slate-600">
+              Every plan needs a pricing offer. Temporary access is a $0 offer
+              with an expiry.
+            </p>
             {check("is_active", "Plan is available")}
           </>
         )}
@@ -303,17 +306,14 @@ export function CommerceEditor({
           <>
             {textArea("description", "Offer description")}
             <p className="text-xs text-slate-600">
-              Included paid plans · one per tool. Multiple tools create a
-              bundle.
+              Included plans · one per tool. Multiple tools create a bundle.
             </p>
             {choices(
               "tier_ids",
-              catalog.tiers
-                .filter((t) => !t.is_free)
-                .map((t) => ({
-                  id: str(t.id),
-                  name: `${catalog.tools.find((tool) => tool.id === t.tool_id)?.name ?? t.tool_id} · ${t.name}`,
-                })),
+              catalog.tiers.map((t) => ({
+                id: str(t.id),
+                name: `${catalog.tools.find((tool) => tool.id === t.tool_id)?.name ?? t.tool_id} · ${t.name}`,
+              })),
             )}
             <label className="block text-xs text-slate-600">
               Access period
@@ -342,17 +342,23 @@ export function CommerceEditor({
                   </option>
                 ) : null}
                 <option value="lifetime">Lifetime</option>
-                <option value="days">Custom days / legacy duration</option>
+                <option value="days">Custom days / temporary access</option>
               </select>
             </label>
             {!!row.days && field("days", "Number of days", "number", true)}
-            {field("price", "Price · USDT", "number", true)}
+            {field(
+              "price",
+              "Sale price · USDT",
+              "number",
+              true,
+              "Amount charged before coupons. $0 requires a limited period and can be activated once per customer.",
+            )}
             {field(
               "compare_at",
-              "Original price · optional",
+              "Regular price · USDT (optional)",
               "number",
               false,
-              "Must be higher than the selling price.",
+              "Must be at least the sale price. A higher price appears crossed out.",
             )}
             {field("sort_order", "Display order", "number")}
             {check("featured", "Recommended offer")}
