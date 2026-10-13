@@ -28,6 +28,19 @@ function origin(value: string | undefined): string | null {
   }
 }
 
+const STAGING_ADMIN_HOST = "fxnod-admin-git-staging-sribees-digitel.vercel.app";
+
+function canonicalStagingAdminUrl(request: NextRequest): URL | null {
+  // The admin API deliberately accepts credentialed requests from the branch
+  // alias only. A Vercel deployment URL has a different origin and cannot
+  // complete login, so send it to that alias before rendering a login form.
+  if (origin(process.env.NEXT_PUBLIC_API_URL) !== "https://admin-staging.fxnod.com") return null;
+  const host = request.nextUrl.hostname;
+  if (host === STAGING_ADMIN_HOST || !/^fxnod-admin-[a-z0-9-]+-sribees-digitel\.vercel\.app$/.test(host)) return null;
+  const canonical = new URL(request.nextUrl.pathname + request.nextUrl.search, `https://${STAGING_ADMIN_HOST}`);
+  return canonical;
+}
+
 function buildCsp(nonce: string): string {
   const isDev = process.env.NODE_ENV !== "production";
 
@@ -63,6 +76,9 @@ function buildCsp(nonce: string): string {
 }
 
 export function middleware(request: NextRequest) {
+  const canonical = canonicalStagingAdminUrl(request);
+  if (canonical) return NextResponse.redirect(canonical, 307);
+
   const nonce = btoa(crypto.randomUUID());
   const csp = buildCsp(nonce);
 

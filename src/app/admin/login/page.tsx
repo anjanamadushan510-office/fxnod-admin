@@ -28,14 +28,14 @@ export default function AdminLoginPage() {
       router.push("/admin/dashboard" as Route);
     } catch (err: unknown) {
       const detail = isAxiosError(err) ? err.response?.data?.detail : undefined;
-      setError(
-        typeof detail === "string"
+      const message =
+        typeof detail === "string" && detail.trim()
           ? detail
           : isAxiosError(err) && !err.response
             ? "Unable to reach the admin API. Check your connection and try again."
-            : "Unable to sign in. Check your email and password, then try again."
-      );
-      toast.error("Admin login failed");
+            : "Unable to sign in. Check your email and password, then try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
