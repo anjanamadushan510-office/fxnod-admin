@@ -12,7 +12,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* dBot Management Card */}
+        {/* FXNOD Bot Builder Management Card */}
         <Link href={"/admin/users" as any} className="group block h-full">
           <div className="h-full bg-white rounded-3xl p-8 border border-gold/20 shadow-xl shadow-gold/5 hover:shadow-2xl hover:shadow-gold/20 hover:border-gold/40 transition-all duration-500 relative overflow-hidden flex flex-col">
             
@@ -29,9 +29,9 @@ export default function AdminDashboardPage() {
             </div>
             
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-navy mb-3">dBot Management</h2>
+              <h2 className="text-2xl font-bold text-navy mb-3">FXNOD Bot Builder Management</h2>
               <p className="text-navy-3 leading-relaxed">
-                Access the registered users database for dBot. Review user access requests, payment receipts, and manage permissions.
+                Access the registered users database for FXNOD Bot Builder. Review user access requests, payment receipts, and manage permissions.
               </p>
             </div>
             

@@ -32,14 +32,14 @@ const scopes: { id: Scope; name: string; description: string }[] = [
   },
   {
     id: "dtrader",
-    name: "dTrader",
-    description: "Blocks new manual trades in dTrader.",
+    name: "FXNOD Trader",
+    description: "Blocks new manual trades in FXNOD Trader.",
   },
   {
     id: "dbot",
-    name: "dBot",
+    name: "FXNOD Bot Builder",
     description:
-      "Blocks new dBot orders and starts. Existing runs pause before their next order.",
+      "Blocks new FXNOD Bot Builder orders and starts. Existing runs pause before their next order.",
   },
   {
     id: "autohub",
