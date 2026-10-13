@@ -18,7 +18,7 @@ import {
 } from "@/services/adminApi";
 
 /**
- * FXNOD Bot Builder subscriptions — who has access, and what has actually been paid.
+ * Bot Forge subscriptions — who has access, and what has actually been paid.
  *
  * Read-only by design. There is no grant or revoke button because the API has
  * no such route: whatever would authorise one becomes a way to mint free
@@ -90,10 +90,10 @@ export default function AdminSubscriptionsPage() {
           </div>
           <div>
             <h1 className="m-0 text-2xl font-bold tracking-tight text-navy">
-              Legacy FXNOD Bot Builder subscriptions
+              Legacy Bot Forge subscriptions
             </h1>
             <p className="m-0 text-sm text-navy-3">
-              Historical FXNOD Bot Builder subscriptions. New memberships and purchases appear in Tools & memberships.
+              Historical Bot Forge subscriptions. New memberships and purchases appear in Tools & memberships.
             </p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function AdminSubscriptionsPage() {
           <Centered>
             <p className="m-0 text-sm text-navy-3">
               {state === "all"
-                ? "Nobody has a FXNOD Bot Builder subscription yet."
+                ? "Nobody has a Bot Forge subscription yet."
                 : "No subscriptions match this filter."}
             </p>
           </Centered>
@@ -361,7 +361,7 @@ function DetailDrawer({
 
           {!loading && !failed && !subscription && (
             <p className="m-0 text-sm text-navy-3">
-              This account has never had a FXNOD Bot Builder subscription.
+              This account has never had a Bot Forge subscription.
             </p>
           )}
 
