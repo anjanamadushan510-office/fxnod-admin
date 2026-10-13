@@ -30,7 +30,7 @@ function middlewareFor(apiUrl) {
 }
 
 function request(hostname) {
-  return { nextUrl: { hostname, pathname: "/admin/login", search: "?next=%2Fadmin%2Fcommerce" }, headers: new Headers() };
+  return { nextUrl: { hostname: "localhost", pathname: "/admin/login", search: "?next=%2Fadmin%2Fcommerce" }, headers: new Headers({ host: hostname }) };
 }
 
 test("staging preview URLs lead to the approved admin origin with the path intact", () => {

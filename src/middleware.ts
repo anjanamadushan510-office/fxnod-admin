@@ -35,7 +35,9 @@ function canonicalStagingAdminUrl(request: NextRequest): URL | null {
   // alias only. A Vercel deployment URL has a different origin and cannot
   // complete login, so send it to that alias before rendering a login form.
   if (origin(process.env.NEXT_PUBLIC_API_URL) !== "https://admin-staging.fxnod.com") return null;
-  const host = request.nextUrl.hostname;
+  // Next's internal URL may use localhost behind a proxy; Host is the public
+  // hostname the browser requested. The regex below only accepts this project.
+  const host = (request.headers.get("host") ?? request.nextUrl.hostname).split(":")[0].toLowerCase();
   if (host === STAGING_ADMIN_HOST || !/^fxnod-admin-[a-z0-9-]+-sribees-digitel\.vercel\.app$/.test(host)) return null;
   const canonical = new URL(request.nextUrl.pathname + request.nextUrl.search, `https://${STAGING_ADMIN_HOST}`);
   return canonical;
