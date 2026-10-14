@@ -60,7 +60,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <nav className="flex-1 overflow-y-auto overscroll-contain py-6 px-5 space-y-2">
-      <div className="px-3 mb-2 text-xs font-semibold text-gold/50 uppercase tracking-wider">
+      <div className="px-3 mb-2 text-xs font-semibold text-[#b8c8dd] uppercase tracking-wider">
         Menu
       </div>
       {NAV.map(({ href, label, icon: Icon }) => {
@@ -97,7 +97,7 @@ function Brand() {
         <ShieldAlert className="w-5 h-5 text-navy" />
       </div>
       <span className="text-2xl font-bold tracking-tight text-gold">
-        FXNOD<span className="font-light text-gold-3 ml-1">Admin</span>
+        FXNOD<span className="font-light text-gold-2 ml-1">Admin</span>
       </span>
     </>
   );
@@ -143,7 +143,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Brand />
         </div>
         <NavLinks />
-        <div className="p-6 border-t border-gold/10 text-xs font-medium text-gold/50 text-center shrink-0">
+        <div className="p-6 border-t border-gold/10 text-xs font-medium text-[#b8c8dd] text-center shrink-0">
           &copy; {new Date().getFullYear()} FXNod.
         </div>
       </aside>
