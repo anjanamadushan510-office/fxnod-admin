@@ -136,7 +136,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const initial = (email[0] ?? "A").toUpperCase();
 
   return (
-    <div className="flex min-h-[100dvh] bg-slate-50">
+    <div className="admin-workspace flex min-h-[100dvh] bg-bg">
       {/* Desktop rail */}
       <aside className="w-64 bg-navy text-[#e9e3cb] flex-col shadow-2xl hidden md:flex sticky top-0 h-[100dvh] border-r border-gold/10">
         <div className="h-20 flex items-center px-8 border-b border-gold/20 shrink-0">
