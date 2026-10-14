@@ -71,7 +71,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             href={href}
             onClick={onNavigate}
             aria-current={on ? "page" : undefined}
-            className={`flex min-h-10 items-center gap-2.5 px-3 py-2 rounded-lg transition-colors group ${
+            className={`flex min-h-11 items-center gap-2.5 px-3 py-2 rounded-lg transition-colors group md:min-h-10 ${
               on ? "bg-gold/10 text-gold" : "text-gold-soft hover:bg-gold/10 hover:text-gold"
             }`}
           >
