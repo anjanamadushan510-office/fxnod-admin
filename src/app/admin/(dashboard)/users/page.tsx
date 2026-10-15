@@ -3,10 +3,13 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { userControls } from "@/services/userControls";
+import { activityDateRange } from "@/lib/activityDateRange";
 export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
   const [state, setState] = useState("all");
+  const [activeFrom, setActiveFrom] = useState("");
+  const [activeTo, setActiveTo] = useState("");
   const [offset, setOffset] = useState(0);
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -21,8 +24,14 @@ export default function AdminUsersPage() {
     refetchInterval: 30000,
   });
   const query = useQuery({
-    queryKey: ["user-directory", debounced, state, offset],
-    queryFn: () => userControls.directory({ search: debounced, state, offset }),
+    queryKey: ["user-directory", debounced, state, activeFrom, activeTo, offset],
+    queryFn: () =>
+      userControls.directory({
+        search: debounced,
+        state,
+        offset,
+        ...activityDateRange(activeFrom, activeTo),
+      }),
   });
   return (
     <div className="space-y-6">
@@ -53,13 +62,13 @@ export default function AdminUsersPage() {
         ))}
       </div>
       <section className="rounded-2xl border bg-white overflow-hidden">
-        <div className="p-5 flex flex-wrap gap-3 border-b">
+        <div className="p-5 flex flex-wrap items-end gap-3 border-b">
           <input
             aria-label="Search users"
             placeholder="Search email or name"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border rounded-xl p-3 flex-1 min-w-48"
+            className="border rounded-xl p-3 flex-1 min-w-56 h-[50px]"
           />
           <select
             aria-label="Account status"
@@ -68,21 +77,70 @@ export default function AdminUsersPage() {
               setState(e.target.value);
               setOffset(0);
             }}
-            className="border rounded-xl p-3"
+            className="border rounded-xl p-3 h-[50px]"
           >
             <option value="all">All accounts</option>
             <option value="active">Unrestricted</option>
             <option value="restricted">Restricted</option>
             <option value="inactive">Inactive</option>
           </select>
+          <fieldset className="flex flex-wrap items-end gap-2">
+            <legend className="sr-only">Filter by active date</legend>
+            <label className="grid gap-1 text-xs font-medium text-slate-500">
+              Active from
+              <input
+                type="date"
+                aria-label="Active from"
+                value={activeFrom}
+                max={activeTo || undefined}
+                onChange={(e) => {
+                  setActiveFrom(e.target.value);
+                  setOffset(0);
+                }}
+                className="h-[50px] rounded-xl border px-3 text-sm text-slate-800"
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-slate-500">
+              Active to
+              <input
+                type="date"
+                aria-label="Active to"
+                value={activeTo}
+                min={activeFrom || undefined}
+                onChange={(e) => {
+                  setActiveTo(e.target.value);
+                  setOffset(0);
+                }}
+                className="h-[50px] rounded-xl border px-3 text-sm text-slate-800"
+              />
+            </label>
+            {(activeFrom || activeTo) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveFrom("");
+                  setActiveTo("");
+                  setOffset(0);
+                }}
+                className="h-[50px] px-2 text-sm font-medium text-slate-500 hover:text-slate-900"
+              >
+                Clear dates
+              </button>
+            )}
+          </fieldset>
           <button
             onClick={() => query.refetch()}
             disabled={query.isFetching}
-            className="px-3 text-sm disabled:opacity-40"
+            className="h-[50px] px-3 text-sm disabled:opacity-40"
           >
             Refresh
           </button>
         </div>
+        {(activeFrom || activeTo) && (
+          <div className="border-b bg-blue-50/60 px-5 py-2 text-sm text-blue-900">
+            Showing users active {activeFrom && activeTo ? `from ${activeFrom} through ${activeTo}` : `on ${activeFrom || activeTo}`}.
+          </div>
+        )}
         {query.isError && (
           <p role="alert" className="p-5 text-red-700">
             Could not load users. Refresh to retry.

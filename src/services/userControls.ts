@@ -54,6 +54,8 @@ export const userControls = {
     search: string;
     state: string;
     offset: number;
+    active_since?: string;
+    active_until?: string;
   }) =>
     (
       await api.get<{
