@@ -2,6 +2,7 @@
 
 import { Cpu, Users, ArrowRight, Activity, TrendingUp, FileText, PenTool, LifeBuoy } from "lucide-react";
 import Link from "next/link";
+import { MaintenanceControl } from "@/components/admin/MaintenanceControl";
 
 export default function AdminDashboardPage() {
   return (
@@ -10,6 +11,8 @@ export default function AdminDashboardPage() {
         <h1 className="text-4xl font-extrabold text-navy tracking-tight">Dashboard Overview</h1>
         <p className="text-lg text-navy-3">Welcome back. Select a module to manage platform operations.</p>
       </div>
+
+      <MaintenanceControl />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {/* dBot Management Card */}

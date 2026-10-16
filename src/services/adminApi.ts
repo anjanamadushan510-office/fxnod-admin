@@ -2,6 +2,14 @@ import { api } from "./api";
 import type { UserPublic } from "./authApi";
 
 export const adminApi = {
+  getMaintenanceStatus: async () => {
+    const res = await api.get<{ enabled: boolean }>("/api/v1/auth/admin/maintenance");
+    return res.data;
+  },
+  setMaintenanceStatus: async (enabled: boolean) => {
+    const res = await api.put<{ enabled: boolean }>("/api/v1/auth/admin/maintenance", { enabled });
+    return res.data;
+  },
   login: async (credentials: { email: string; password: string; totp_code?: string }) => {
     // We explicitly call the admin login endpoint
     // It will set the fxnod_admin_refresh httpOnly cookie
