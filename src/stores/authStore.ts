@@ -7,7 +7,6 @@ import {
   registerAuthExpiredHandler,
   setAdminAccessToken,
 } from "@/services/authToken";
-import { authApi } from "@/services/authApi";
 
 interface AuthState {
   user: UserPublic | null;
@@ -28,14 +27,20 @@ export const useAuthStore = create<AuthState>((set) => {
     status: "idle",
 
     async login(email, password, totpCode) {
-      set({ status: "loading" });
+      // The form owns its pending state. Switching the session to loading here
+      // unmounts it in AdminGuard, hiding errors and preventing a retry.
       // Authenticator apps show "123 456"; the API wants the digits alone.
-      // Left out entirely when blank, for environments that do not ask.
       const totp_code = totpCode?.replace(/\s+/g, "") || undefined;
-      const { access_token } = await adminApi.login({ email, password, totp_code });
-      setAdminAccessToken(access_token);
-      const user = await adminApi.me();
-      set({ user, status: "authenticated" });
+      try {
+        const { access_token } = await adminApi.login({ email: email.trim(), password, totp_code });
+        setAdminAccessToken(access_token);
+        const user = await adminApi.me();
+        set({ user, status: "authenticated" });
+      } catch (error) {
+        setAdminAccessToken(null);
+        set({ user: null, status: "anonymous" });
+        throw error;
+      }
     },
 
     async logout() {
@@ -52,11 +57,12 @@ export const useAuthStore = create<AuthState>((set) => {
     async bootstrap() {
       set({ status: "loading" });
       try {
-        // No access token in memory after a reload → /users/me 401 → the
+        // No access token in memory after a reload → /auth/admin/me 401 → the
         // interceptor refreshes via cookie → retry succeeds if still valid.
         const user = await adminApi.me();
         set({ user, status: "authenticated" });
       } catch {
+        setAdminAccessToken(null);
         set({ user: null, status: "anonymous" });
       }
     },

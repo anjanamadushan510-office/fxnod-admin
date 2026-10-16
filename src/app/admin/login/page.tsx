@@ -4,9 +4,9 @@ import { useState } from "react";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 import { useAuthStore } from "@/stores/authStore";
-import { AuthShell } from "@/components/auth/AuthShell";
 import { Field, SubmitButton } from "@/components/auth/fields";
 
 export default function AdminLoginPage() {
@@ -14,7 +14,6 @@ export default function AdminLoginPage() {
   const { login } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [totpCode, setTotpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,13 +23,19 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      await login(email, password, totpCode);
+      await login(email, password);
       toast.success("Admin login successful");
       router.push("/admin/dashboard" as Route);
-    } catch (err: any) {
-      console.error("Admin login error", err);
-      setError(err?.response?.data?.detail || "Failed to log in");
-      toast.error("Admin login failed");
+    } catch (err: unknown) {
+      const detail = isAxiosError(err) ? err.response?.data?.detail : undefined;
+      const message =
+        typeof detail === "string" && detail.trim()
+          ? detail
+          : isAxiosError(err) && !err.response
+            ? "Unable to reach the admin API. Check your connection and try again."
+            : "Unable to sign in. Check your email and password, then try again.";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -60,13 +65,6 @@ export default function AdminLoginPage() {
             onChange={setPassword}
             required
             placeholder="••••••••"
-          />
-          <Field
-            label="Authenticator code"
-            value={totpCode}
-            onChange={setTotpCode}
-            autoComplete="one-time-code"
-            placeholder="6-digit code"
           />
 
           {error && (

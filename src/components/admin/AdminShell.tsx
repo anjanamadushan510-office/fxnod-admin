@@ -5,7 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Banknote,
+  Activity,
   Cpu,
+  Boxes,
   LayoutDashboard,
   LifeBuoy,
   Menu,
@@ -31,8 +33,10 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/activity", label: "User activity", icon: Activity },
   { href: "/admin/deposits", label: "Deposits", icon: Wallet },
-  { href: "/admin/subscriptions", label: "dBot subscriptions", icon: Cpu },
+  { href: "/admin/commerce", label: "Tools & memberships", icon: Boxes },
+  { href: "/admin/subscriptions", label: "Legacy subscriptions", icon: Cpu },
   { href: "/admin/payouts", label: "Deriv payouts", icon: Banknote },
   { href: "/admin/tickets", label: "Ticket Management", icon: LifeBuoy },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
@@ -55,8 +59,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const active = activeHref(pathname);
 
   return (
-    <nav className="flex-1 overflow-y-auto overscroll-contain py-6 px-5 space-y-2">
-      <div className="px-3 mb-2 text-xs font-semibold text-gold/50 uppercase tracking-wider">
+    <nav className="flex-1 overflow-y-auto overscroll-contain py-3 px-3 space-y-1">
+      <div className="px-3 mb-2 text-xs font-semibold text-[#b8c8dd] uppercase tracking-wider">
         Menu
       </div>
       {NAV.map(({ href, label, icon: Icon }) => {
@@ -67,12 +71,12 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             href={href}
             onClick={onNavigate}
             aria-current={on ? "page" : undefined}
-            className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 group ${
+            className={`flex min-h-11 items-center gap-2.5 px-3 py-2 rounded-lg transition-colors group md:min-h-10 ${
               on ? "bg-gold/10 text-gold" : "text-gold-soft hover:bg-gold/10 hover:text-gold"
             }`}
           >
             <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+              className={`w-7 h-7 rounded-md flex items-center justify-center transition-colors ${
                 on ? "bg-gold/20 text-gold" : "bg-gold/5 group-hover:bg-gold/20 group-hover:text-gold"
               }`}
             >
@@ -89,11 +93,11 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 function Brand() {
   return (
     <>
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-3 flex items-center justify-center mr-3 shadow-lg shadow-gold/20">
+      <div className="w-9 h-9 shrink-0 rounded-lg bg-gold flex items-center justify-center mr-2">
         <ShieldAlert className="w-5 h-5 text-navy" />
       </div>
-      <span className="text-2xl font-bold tracking-tight text-gold">
-        FXNOD<span className="font-light text-gold-3 ml-1">Admin</span>
+      <span className="text-xl font-bold tracking-tight text-gold whitespace-nowrap">
+        FXNOD<span className="font-light text-gold-2 ml-1">Admin</span>
       </span>
     </>
   );
@@ -132,14 +136,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const initial = (email[0] ?? "A").toUpperCase();
 
   return (
-    <div className="flex min-h-[100dvh] bg-slate-50">
+    <div className="admin-workspace flex min-h-[100dvh] bg-bg">
       {/* Desktop rail */}
-      <aside className="w-64 bg-navy text-[#e9e3cb] flex-col shadow-2xl hidden md:flex sticky top-0 h-[100dvh] border-r border-gold/10">
-        <div className="h-20 flex items-center px-8 border-b border-gold/20 shrink-0">
+      <aside className="w-56 bg-navy text-[#e9e3cb] flex-col hidden md:flex sticky top-0 h-[100dvh] border-r border-gold/10">
+        <div className="h-14 flex items-center px-4 border-b border-gold/20 shrink-0">
           <Brand />
         </div>
         <NavLinks />
-        <div className="p-6 border-t border-gold/10 text-xs font-medium text-gold/50 text-center shrink-0">
+        <div className="p-3 border-t border-gold/10 text-xs font-medium text-[#b8c8dd] text-center shrink-0">
           &copy; {new Date().getFullYear()} FXNod.
         </div>
       </aside>
@@ -177,7 +181,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-[100dvh] min-w-0">
-        <header className="box-content h-16 md:h-20 bg-white/80 backdrop-blur-xl border-b border-gold/20 flex items-center justify-between gap-3 px-4 md:px-8 pt-safe sticky top-0 z-40 shrink-0">
+        <header className="box-content h-14 bg-white/90 border-b border-gold/20 flex items-center justify-between gap-3 px-4 md:px-6 pt-safe sticky top-0 z-40 shrink-0">
           <div className="flex min-w-0 items-center gap-3 md:hidden">
             <button
               type="button"
@@ -211,7 +215,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-8 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-8 overflow-x-hidden">
+        <main className="flex-1 p-4 md:p-6 pb-[max(1rem,env(safe-area-inset-bottom))] md:pb-6 overflow-x-hidden">
           <div className="max-w-6xl mx-auto w-full">{children}</div>
         </main>
       </div>

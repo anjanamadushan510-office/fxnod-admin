@@ -3,25 +3,26 @@
 @tailwind utilities;
 
 /* ============================================================================
-   FXNod design tokens. Lifted from the home UI prototype.
+   FXNOD workspace design tokens.
    Switch theme by toggling `data-theme="dark"` on <html>.
    ============================================================================ */
 :root {
-  --bg: #f4f3ef;
+  color-scheme: light;
+  --bg: #f3f6fb;
   --surface: #ffffff;
-  --surface-2: #fbfaf6;
-  --ink: #0a1430;
-  --ink-2: #3a435c;
-  --ink-3: #7b8298;
-  --line: #e7e4dc;
-  --line-2: #eeebe3;
-  --navy: #0a1535;
-  --navy-2: #091230;
-  --navy-3: #13204a;
-  --gold: #c9a24e;
-  --gold-2: #d9b663;
-  --gold-3: #a98639;
-  --gold-soft: #f4ead0;
+  --surface-2: #eaf0f8;
+  --ink: #152e52;
+  --ink-2: #435a76;
+  --ink-3: #5b6d84;
+  --line: #dce4ef;
+  --line-2: #bccbdd;
+  --navy: #102747;
+  --navy-2: #0c203c;
+  --navy-3: #224b78;
+  --gold: #c49a45;
+  --gold-2: #ecd08d;
+  --gold-3: #85601e;
+  --gold-soft: #faf2df;
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 1px 2px rgba(10, 20, 48, 0.05),
     0 8px 30px -16px rgba(10, 20, 48, 0.18);
@@ -31,6 +32,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg: #070d20;
   --surface: #0d1633;
   --surface-2: #0a112a;
@@ -47,6 +49,30 @@
     0 1px 2px rgba(0, 0, 0, 0.4),
     0 12px 40px -16px rgba(0, 0, 0, 0.6);
 }
+
+.admin-workspace main {
+  background: linear-gradient(180deg, #edf3fb 0, var(--bg) 420px);
+}
+.admin-workspace main :is(article, section).bg-white,
+.admin-workspace main .admin-module-card {
+  box-shadow: var(--shadow-card);
+  border-color: var(--line);
+}
+.admin-workspace nav a[aria-current="page"] {
+  color: #f6dfaa;
+  background: #234b78;
+  box-shadow: inset 3px 0 #d6b66e;
+}
+.admin-workspace header {
+  border-color: var(--line);
+  box-shadow: 0 2px 14px -10px rgba(21, 46, 82, 0.25);
+}
+.admin-workspace :is(input, select, textarea):focus-visible,
+.admin-workspace :is(button, a):focus-visible {
+  outline: 2px solid #3973b8;
+  outline-offset: 3px;
+}
+.admin-workspace tbody tr:hover { background: #edf3fb; }
 
 html,
 body {
@@ -154,8 +180,7 @@ a {
 }
 
 /* ============================================================================
-   Options trading scope — visually distinct from the navy/gold home theme.
-   Vela-inspired: warm stone canvas, oklch rise/fall, Inter Tight.
+   Options trading scope — shared navy surfaces with distinct trade outcomes.
 
    Activate by setting `data-app="options"` on the route's outer wrapper.
    Tokens here OVERRIDE the home defaults inside that scope only.
