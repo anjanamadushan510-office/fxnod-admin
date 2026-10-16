@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MaintenanceControl } from "@/components/admin/MaintenanceControl";
 import {
   Activity, ArrowUpRight, Banknote, Boxes, Cpu, LifeBuoy,
   Newspaper, UserX, Users, Wallet, type LucideIcon,
@@ -23,6 +24,7 @@ export default function AdminDashboardPage() {
         <h1 className="text-2xl font-bold tracking-tight text-navy">Operations overview</h1>
         <p className="mt-1 text-sm text-navy-3">Choose a workspace to review and manage FXNOD.</p>
       </header>
+      <MaintenanceControl />
       {(["Monitor", "Money", "Products", "Content & support"] as const).map((group) => (
         <section key={group} aria-labelledby={`group-${group.replace(/\W+/g, "-")}`} className="space-y-3">
           <h2 id={`group-${group.replace(/\W+/g, "-")}`} className="text-xs font-semibold uppercase tracking-wider text-navy-3">{group}</h2>
