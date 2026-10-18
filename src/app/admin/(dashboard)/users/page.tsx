@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { userControls } from "@/services/userControls";
-import { activityDateRange } from "@/lib/activityDateRange";
+import { activityDateRange, activityDateRangeError } from "@/lib/activityDateRange";
 export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
@@ -11,6 +11,7 @@ export default function AdminUsersPage() {
   const [activeFrom, setActiveFrom] = useState("");
   const [activeTo, setActiveTo] = useState("");
   const [offset, setOffset] = useState(0);
+  const dateError = activityDateRangeError(activeFrom, activeTo);
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebounced(search);
@@ -24,6 +25,7 @@ export default function AdminUsersPage() {
     refetchInterval: 30000,
   });
   const query = useQuery({
+    enabled: !dateError,
     queryKey: ["user-directory", debounced, state, activeFrom, activeTo, offset],
     queryFn: () =>
       userControls.directory({
@@ -130,15 +132,20 @@ export default function AdminUsersPage() {
           </fieldset>
           <button
             onClick={() => query.refetch()}
-            disabled={query.isFetching}
+            disabled={query.isFetching || !!dateError}
             className="h-[50px] px-3 text-sm disabled:opacity-40"
           >
             Refresh
           </button>
         </div>
-        {(activeFrom || activeTo) && (
+        {dateError && (
+          <p role="alert" className="border-b px-5 py-3 text-sm text-red-700">
+            {dateError}
+          </p>
+        )}
+        {!dateError && (activeFrom || activeTo) && (
           <div className="border-b bg-blue-50/60 px-5 py-2 text-sm text-blue-900">
-            Showing users active {activeFrom && activeTo ? `from ${activeFrom} through ${activeTo}` : `on ${activeFrom || activeTo}`}.
+            Showing users active {activeFrom && activeTo ? `from ${activeFrom} through ${activeTo}` : `on ${activeFrom || activeTo}`} (your local timezone).
           </div>
         )}
         {query.isError && (
@@ -206,7 +213,7 @@ export default function AdminUsersPage() {
                   <td colSpan={5} className="p-12 text-center text-slate-500">
                     {query.isLoading
                       ? "Loading accounts…"
-                      : "No matching accounts."}
+                      : dateError ? "Choose a valid activity date range." : "No matching accounts."}
                   </td>
                 </tr>
               )}
@@ -220,14 +227,14 @@ export default function AdminUsersPage() {
           </span>
           <div className="flex gap-4">
             <button
-              disabled={!offset}
+              disabled={!offset || !!dateError}
               onClick={() => setOffset(offset - 25)}
               className="disabled:opacity-30"
             >
               Previous
             </button>
             <button
-              disabled={offset + 25 >= (query.data?.total ?? 0)}
+              disabled={!!dateError || offset + 25 >= (query.data?.total ?? 0)}
               onClick={() => setOffset(offset + 25)}
               className="disabled:opacity-30"
             >
