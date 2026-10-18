@@ -1,9 +1,6 @@
 # Admin console CI.
 #
-# This repository has had no CI. The only workflow runs GitHub shows for it are
-# from an orphaned commit that is not in this history — leftovers from how the
-# repo was first created — so nothing has ever checked that a commit here
-# type-checks or builds.
+# Typecheck, test, lint, and build every deploy branch and pull request.
 #
 # It matters more here than in the customer app: this console approves
 # withdrawals and credits wallets, and it is the one surface where a broken
@@ -11,10 +8,9 @@
 name: ci
 
 on:
+  workflow_dispatch:
   push:
-    # All three deploy branches. Vercel builds each of them, and a branch
-    # left out here is deployed with nothing having checked that it
-    # type-checks or builds: testing was, from the day it was created.
+    # Cover all three deploy branches before their Vercel releases.
     branches: [main, staging, testing]
     tags: ["v*"]
   pull_request:
