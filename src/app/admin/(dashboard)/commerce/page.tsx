@@ -280,6 +280,11 @@ export default function CommercePage() {
                         {row.is_active ? "Active" : "Retired"}
                       </Badge>
                       <p className="mt-3 text-xs text-slate-600">
+                        {Number(row.team_seats) > 0 && (
+                          <strong>
+                            Team · {Number(row.team_seats)} additional members ·{" "}
+                          </strong>
+                        )}
                         {list(row.features).join(" · ")}
                       </p>
                     </>

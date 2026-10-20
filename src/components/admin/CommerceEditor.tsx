@@ -23,6 +23,7 @@ export const defaults: Record<Entity, Row> = {
     capabilities: [],
     is_free: false,
     is_active: true,
+    team_seats: 0,
   },
   offers: {
     id: "",
@@ -82,7 +83,11 @@ export function CommerceEditor({
 }) {
   const [row, setRow] = useState<Row>(initial);
   const set = (key: string, value: unknown) =>
-    setRow((r) => ({ ...r, [key]: value }));
+    setRow((r) => ({
+      ...r,
+      [key]: value,
+      ...(key === "tool_id" && value !== "autohub" ? { team_seats: 0 } : {}),
+    }));
   const field = (
     key: string,
     label: string,
@@ -105,12 +110,16 @@ export function CommerceEditor({
               (kind === "tiers" && key === "rank")))
         }
         min={type === "number" ? 0 : undefined}
-        step={type === "number" ? "any" : undefined}
+        step={
+          type === "number" ? (key === "team_seats" ? 1 : "any") : undefined
+        }
+        max={key === "team_seats" ? 1000 : undefined}
         onChange={(e) =>
           set(
             key,
             [
               "rank",
+              "team_seats",
               "sort_order",
               "max_uses",
               "per_user_limit",
@@ -281,6 +290,14 @@ export function CommerceEditor({
               true,
               "Higher levels are upgrades; for example, 0 for Basic and 10 for Pro.",
             )}
+            {str(row.tool_id) === "autohub" &&
+              field(
+                "team_seats",
+                "Additional team members",
+                "number",
+                true,
+                "0 = personal plan. Team seats exclude the owner (maximum 1000). Purchased seat limits are retained; edits affect future purchases.",
+              )}
             {textArea(
               "features",
               "Customer-facing features · one per line",
